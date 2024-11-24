@@ -69,12 +69,37 @@ map_data = [
     # section 7
     { "x": 4800, "y": 0, "type": "invisible", "width": 3000, "height": 100 },
 
+    { "x": 4840, "y": 370, "type": "block", "width": 40, "height": 40 },
+    { "x": 4880, "y": 370, "type": "block", "width": 40, "height": 40 },
+    { "x": 4920, "y": 370, "type": "block", "width": 40, "height": 40 },
+
+    { "x": 5120, "y": 370, "type": "block", "width": 40, "height": 40 },
+    { "x": 5160, "y": 210, "type": "block", "width": 40, "height": 40 },
+    { "x": 5200, "y": 210, "type": "block", "width": 40, "height": 40 },
+    { "x": 5240, "y": 370, "type": "block", "width": 40, "height": 40 },
+
+    { "x": 5160, "y": 370, "type": "question_block", "width": 40, "height": 40},
+    { "x": 5200, "y": 370, "type": "question_block", "width": 40, "height": 40},
+
     # section 8
     { "x": 5600, "y": 0, "type": "invisible", "width": 3000, "height": 100 },
 
     # section 9
     { "x": 6400, "y": 0, "type": "invisible", "width": 3000, "height": 100 },
 
+    { "x": 6720, "y": 210, "type": "block", "width": 40, "height": 40 },
+    { "x": 6760, "y": 210, "type": "block", "width": 40, "height": 40 },
+    { "x": 6840, "y": 210, "type": "block", "width": 40, "height": 40 },
+
+    { "x": 6800, "y": 210, "type": "question_block", "width": 40, "height": 40},
+
+    { "x": 6520, "y": 87, "type": "pipe", "width": 80, "height": 80 },
+    { "x": 7160, "y": 87, "type": "pipe", "width": 80, "height": 80 },
+
+
     # section 10
-    { "x": 7200, "y": 0, "type": "invisible", "width": 3000, "height": 100 }
+    { "x": 7200, "y": 0, "type": "invisible", "width": 3000, "height": 100 },
+
+    { "x": 7160, "y": 87, "type": "pipe", "width": 80, "height": 80 }
+
 ]
