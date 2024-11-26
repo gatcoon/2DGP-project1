@@ -11,11 +11,11 @@ class Block:
 
     def load_image(self):
         if self.block_type == "block":
-            return load_image('C:/Githup_2024_2/Drill/project_1/sprites/block.png')
+            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/block.png')
         elif self.block_type == "question_block":
-            return load_image('C:/Githup_2024_2/Drill/project_1/sprites/question_block.png')
+            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/question_block.png')
         elif self.block_type == "pipe":
-            return load_image('C:/Githup_2024_2/Drill/project_1/sprites/pipe.png')
+            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/pipe.png')
         else:
             return None
 

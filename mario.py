@@ -10,7 +10,7 @@ class Mario:
         self.frame = 0
         self.facing_direction = 1
         self.state = "idle"
-        self.image = load_image('C:/Githup_2024_2/Drill/project_1/sprites/small_mario_state.png')
+        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
         self.on_ground = False
         self.running = False  # 달리기 상태 추가
 

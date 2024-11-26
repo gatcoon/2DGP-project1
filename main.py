@@ -6,9 +6,9 @@ def main():
     open_canvas(800, 600)
 
     # 타이틀 화면 로드
-    title_image = load_image('C:/Githup_2024_2/Drill/project_1/sprites/title.png')
+    title_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/title.png')
     screen_width, screen_height = 800, 600
-    background_image = load_image('C:/Githup_2024_2/Drill/project_1/sprites/stage_1_1.png')
+    background_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/stage_1_1.png')
 
     # 타이틀 화면 표시
     show_title_screen = True
