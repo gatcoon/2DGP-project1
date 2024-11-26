@@ -13,8 +13,13 @@ class Mario:
         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
         self.on_ground = False
         self.running = False  # 달리기 상태 추가
+        self.is_dead = False  # 죽음 상태
 
-    def update(self, blocks):
+    def update(self, blocks, reset_to_section_1):
+        if self.is_dead:
+            self.handle_death(reset_to_section_1)
+            return
+
         # 이동 처리
         move_speed = 1.4 if not self.running else 2.5  # 달리기 상태에서 이동 속도 증가
         self.x += self.velocity * move_speed
@@ -23,7 +28,7 @@ class Mario:
         if self.is_jumping:
             self.state = "jump"
         elif self.velocity != 0:
-            self.state = "run" if self.running else "walk"  # 달리기 상태 구분
+            self.state = "run" if self.running else "walk"
         else:
             self.state = "idle"
 
@@ -56,9 +61,21 @@ class Mario:
             self.y += self.jump_speed
             self.jump_speed -= self.gravity
 
-        # 화면 아래로 떨어지면 초기 위치로 리셋
+        # 화면 아래로 떨어지면 죽음 상태로 전환
         if self.y < -50:
+            self.state = "death"
+            self.is_dead = True
+            self.frame = 6
+            self.jump_speed = 30  # 죽을 때 점프 속도
+
+    def handle_death(self, reset_to_section_1):
+        self.y += self.jump_speed
+        self.jump_speed -= self.gravity
+
+        if self.y < -100:  # 마리오가 충분히 떨어졌을 때 초기화
             self.reset_position()
+            delay(0.5)
+            reset_to_section_1()
 
     def check_collision(self, block, next_y):
         # Mario의 충돌 박스 계산
@@ -77,7 +94,6 @@ class Mario:
             and mario_bottom < block_top
             and mario_top > block_bottom
         ):
-            # 충돌 방향 판단
             if mario_bottom < block_top and self.jump_speed > 0:
                 return "bottom"
             elif mario_top > block_bottom and self.jump_speed <= 0:
@@ -89,9 +105,13 @@ class Mario:
         self.velocity = 0
         self.jump_speed = 0
         self.is_jumping = False
+        self.is_dead = False
         self.state = "idle"
 
     def handle_event(self, event):
+        if self.is_dead:
+            return
+
         if event.type == SDL_KEYDOWN:
             if event.key == SDLK_RIGHT:
                 self.velocity = 4

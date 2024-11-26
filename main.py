@@ -49,8 +49,12 @@ def main():
         # 맵 데이터 그리기 (현재 섹션의 블럭만 표시)
         map_loader.draw(current_section)
 
+        def reset_to_section_1():
+            nonlocal current_section
+            current_section = 0
+
         # 마리오 업데이트
-        mario.update(map_loader.get_blocks(current_section))
+        mario.update(map_loader.get_blocks(current_section), reset_to_section_1)
 
         # 섹션 이동 처리
         if mario.x >= screen_width:  # 다음 섹션으로 이동
