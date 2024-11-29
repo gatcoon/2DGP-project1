@@ -6,6 +6,9 @@ map_data = [
 
     { "x": 640, "y": 210, "type": "question_block", "width": 40, "height": 40 },
 
+
+    { "x": 640, "y": 100, "type": "enemy" },
+
     # section 2
     { "x": 800, "y": 0, "type": "invisible", "width": 1600, "height": 90 },
 
@@ -18,6 +21,9 @@ map_data = [
 
     { "x": 1120, "y": 87, "type": "pipe", "width": 80, "height": 85 },
     { "x": 1518, "y": 87, "type": "pipe", "width": 80, "height": 130 },
+
+
+    { "x": 880, "y": 100, "type": "enemy" },
 
     # section 3
     { "x": 1600, "y": 0, "type": "invisible", "width": 2400, "height": 90 },
@@ -33,6 +39,8 @@ map_data = [
     { "x": 3080, "y": 210, "type": "block", "width": 40, "height": 40 },
     { "x": 3160, "y": 210, "type": "block", "width": 40, "height": 40 },
     { "x": 3120, "y": 210, "type": "question_block", "width": 40, "height": 40 },
+
+    { "x": 2600, "y": 100, "type": "enemy" },
 
     # section 5
     { "x": 3200, "y": 0, "type": "invisible", "width": 240, "height": 90 },

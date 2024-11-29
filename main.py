@@ -36,6 +36,10 @@ def main():
     num_sections = scaled_width // section_width  # 전체 섹션 개수
     current_section = 0
 
+    def reset_to_section_1():
+        nonlocal current_section
+        current_section = 0
+
     running = True
     while running:
         clear_canvas()
@@ -49,9 +53,8 @@ def main():
         # 맵 데이터 그리기 (현재 섹션의 블럭만 표시)
         map_loader.draw(current_section)
 
-        def reset_to_section_1():
-            nonlocal current_section
-            current_section = 0
+        # 적 업데이트
+        map_loader.update_enemies()
 
         # 마리오 업데이트
         mario.update(map_loader.get_blocks(current_section), reset_to_section_1)
