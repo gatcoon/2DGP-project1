@@ -20,7 +20,7 @@ class MapLoader:
 
         for data in map_data:
             section_index = data["x"] // section_width
-            if data["type"] in ["block", "question_block", "pipe", "invisible"]:
+            if data["type"] in ["block", "question_block", "pipe", "invisible", "solid"]:
                 block = Block(data["x"] % section_width, data["y"], data["width"], data["height"], data["type"])
                 self.sections[section_index].append(block)
             elif data["type"] == "enemy":

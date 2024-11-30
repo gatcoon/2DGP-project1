@@ -23,13 +23,17 @@ map_data = [
     { "x": 1518, "y": 87, "type": "pipe", "width": 80, "height": 130 },
 
 
-    { "x": 880, "y": 100, "type": "enemy" },
+    { "x": 1300, "y": 100, "type": "enemy" },
+
+    { "x": 900, "y": 150, "type": "powerup", "width": 40, "height": 40 },
 
     # section 3
     { "x": 1600, "y": 0, "type": "invisible", "width": 2400, "height": 90 },
 
     { "x": 1840, "y": 87, "type": "pipe", "width": 80, "height": 165 },
     { "x": 2280, "y": 87, "type": "pipe", "width": 80, "height": 165 },
+
+    { "x": 2200, "y": 100, "type": "enemy" },
 
     # section 4
     { "x": 2400, "y": 0, "type": "invisible", "width": 360, "height": 90 },
@@ -39,8 +43,6 @@ map_data = [
     { "x": 3080, "y": 210, "type": "block", "width": 40, "height": 40 },
     { "x": 3160, "y": 210, "type": "block", "width": 40, "height": 40 },
     { "x": 3120, "y": 210, "type": "question_block", "width": 40, "height": 40 },
-
-    { "x": 2600, "y": 100, "type": "enemy" },
 
     # section 5
     { "x": 3200, "y": 0, "type": "invisible", "width": 240, "height": 90 },

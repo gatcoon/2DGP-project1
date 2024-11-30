@@ -16,6 +16,8 @@ class Block:
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/question_block.png')
         elif self.block_type == "pipe":
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/pipe.png')
+        elif self.block_type == "solid":
+            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')
         else:
             return None
 
