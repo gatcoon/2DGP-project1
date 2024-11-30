@@ -27,6 +27,12 @@ class MapLoader:
                 enemy = Enemy(data["x"] % section_width, data["y"])
                 self.enemies[section_index].append(enemy)
 
+    def reset_enemies(self, section):
+        # 해당 섹션의 적을 초기 위치로 복구
+        if 0 <= section < len(self.enemies):
+            for enemy in self.enemies[section]:
+                enemy.reset()
+
     def draw(self, section):
         if 0 <= section < len(self.sections):
             for block in self.sections[section]:

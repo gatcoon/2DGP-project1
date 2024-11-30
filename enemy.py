@@ -2,9 +2,10 @@ from pico2d import *
 
 class Enemy:
     def __init__(self, x, y):
+        self.initial_x, self.initial_y = x, y  # 초기 위치 저장
         self.x, self.y = x, y
         self.width, self.height = 40, 40
-        self.velocity = -2  # 이동 속도 증가 (기존 -1에서 -2로)
+        self.velocity = -2  # 초기 이동 방향 (왼쪽)
         self.frame = 0
         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/goomba.png')
         self.is_defeated = False  # 적이 패배 상태인지 여부
@@ -21,14 +22,14 @@ class Enemy:
 
         # 걷기 애니메이션 (0, 1 프레임 반복) 속도 조절
         self.frame_delay += 0.03
-        if self.frame_delay >= 0.15:  # 프레임 변경 간격 증가 (기존보다 느려짐)
+        if self.frame_delay >= 0.15:  # 프레임 변경 간격 증가
             self.frame = (self.frame + 1) % 2
             self.frame_delay = 0
 
         # 좌우 이동 처리
         self.x += self.velocity
 
-        # 블럭, 파이프와의 충돌 처리 (땅은 제외)
+        # 블럭, 파이프와의 충돌 처리
         for block in blocks:
             if block.block_type != "invisible" and self.check_collision(block):
                 self.velocity *= -1  # 이동 방향 반전
@@ -40,6 +41,14 @@ class Enemy:
             self.velocity = 2
         elif self.x >= 780:  # 화면 오른쪽 경계
             self.velocity = -2
+
+    def reset(self):
+        # 적의 상태를 초기화
+        self.x, self.y = self.initial_x, self.initial_y
+        self.velocity = -2  # 이동 방향 초기화
+        self.is_defeated = False
+        self.frame = 0
+        self.defeat_timer = 0
 
     def handle_defeat(self):
         # 적 패배 상태 설정

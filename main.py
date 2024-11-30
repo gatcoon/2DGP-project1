@@ -52,6 +52,7 @@ def main():
         def reset_to_section_1():
             nonlocal current_section
             current_section = 0
+            map_loader.reset_enemies(current_section)  # 1번 섹션의 적 초기화
 
         # 마리오 업데이트
         mario.update(
@@ -65,6 +66,7 @@ def main():
             if current_section < num_sections - 1:  # 마지막 섹션이 아닌 경우
                 current_section += 1
                 mario.x = 0  # 마리오를 화면 왼쪽으로 이동
+                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
             else:  # 마지막 섹션인 경우 끝에서 멈춤
                 mario.x = screen_width - 1
 
@@ -72,6 +74,7 @@ def main():
             if current_section > 0:  # 첫 섹션이 아닌 경우
                 current_section -= 1
                 mario.x = screen_width  # 마리오를 화면 오른쪽으로 이동
+                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
             else:  # 첫 섹션인 경우 더 왼쪽으로 못 가게 함
                 mario.x = 1
 
