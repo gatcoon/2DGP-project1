@@ -13,41 +13,34 @@ class MapLoader:
         section_width = 800  # 각 섹션의 너비
         num_sections = max(data["x"] // section_width for data in map_data) + 1
 
+        # 섹션 초기화
         for section in range(num_sections):
-            section_blocks = []
-            for data in map_data:
-                if data["x"] // section_width == section:
-                    # 누락된 width와 height 처리
-                    width = data.get("width", 40)   # 기본값: 40
-                    height = data.get("height", 40) # 기본값: 40
+            self.sections.append([])
+            self.enemies.append([])
 
-                    if data["type"] == "enemy":
-                        # 적 객체 추가
-                        self.enemies.append(Enemy(data["x"], data["y"]))
-                    else:
-                        # 블럭 추가
-                        section_blocks.append(Block(data["x"] % section_width, data["y"], width, height, data["type"]))
-            self.sections.append(section_blocks)
+        for data in map_data:
+            section_index = data["x"] // section_width
+            if data["type"] in ["block", "question_block", "pipe", "invisible"]:
+                block = Block(data["x"] % section_width, data["y"], data["width"], data["height"], data["type"])
+                self.sections[section_index].append(block)
+            elif data["type"] == "enemy":
+                enemy = Enemy(data["x"] % section_width, data["y"])
+                self.enemies[section_index].append(enemy)
 
-    def draw(self, section, camera_left=0):
+    def draw(self, section):
         if 0 <= section < len(self.sections):
             for block in self.sections[section]:
-                block.draw(camera_left)  # 블럭 그리기
-
-        # 모든 적 그리기
-        for enemy in self.enemies:
-            enemy.draw(camera_left)  # camera_left를 인자로 전달
-
-    def update_enemies(self):
-        for enemy in self.enemies:
-            enemy.update(self.get_all_blocks())  # 적과의 충돌 체크
+                block.draw(0)  # 화면 고정, 카메라 이동 없음
+            for enemy in self.enemies[section]:
+                enemy.draw(0)  # 화면 고정, 카메라 이동 없음
 
     def get_blocks(self, section):
         return self.sections[section] if 0 <= section < len(self.sections) else []
 
-    def get_all_blocks(self):
-        # 모든 섹션의 블럭 합치기
-        all_blocks = []
-        for section in self.sections:
-            all_blocks.extend(section)
-        return all_blocks
+    def get_enemies(self, section):
+        return self.enemies[section] if 0 <= section < len(self.enemies) else []
+
+    def update(self, section, screen_width):
+        if 0 <= section < len(self.sections):
+            for enemy in self.enemies[section]:
+                enemy.update(self.sections[section], screen_width)
