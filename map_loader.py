@@ -43,4 +43,5 @@ class MapLoader:
     def update(self, section, screen_width):
         if 0 <= section < len(self.sections):
             for enemy in self.enemies[section]:
-                enemy.update(self.sections[section], screen_width)
+                if not enemy.update(self.sections[section], screen_width):
+                    self.enemies[section].remove(enemy)  # 적 제거

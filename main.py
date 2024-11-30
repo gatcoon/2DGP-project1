@@ -46,7 +46,7 @@ def main():
         # 배경 그리기 (현재 섹션만 표시)
         background_image.draw_to_origin(-section_start, 0, scaled_width, screen_height)
 
-        # 맵 데이터 그리기 (현재 섹션의 블럭만 표시)
+        # 맵 데이터 그리기 (현재 섹션의 블럭 및 적 표시)
         map_loader.draw(current_section)
 
         def reset_to_section_1():
@@ -54,10 +54,11 @@ def main():
             current_section = 0
 
         # 마리오 업데이트
-        mario.update(map_loader.get_blocks(current_section), reset_to_section_1)
-
-        # 몬스터 업데이트
-        map_loader.update(current_section, screen_width)
+        mario.update(
+            map_loader.get_blocks(current_section),
+            map_loader.get_enemies(current_section),
+            reset_to_section_1
+        )
 
         # 섹션 이동 처리
         if mario.x >= screen_width:  # 다음 섹션으로 이동
@@ -77,8 +78,9 @@ def main():
         # 마리오 그리기
         mario.draw()
 
-        # 몬스터 그리기
+        # 적 업데이트 및 그리기
         for enemy in map_loader.get_enemies(current_section):
+            enemy.update(map_loader.get_blocks(current_section))
             enemy.draw(0)  # 카메라 이동 없음
 
         update_canvas()
