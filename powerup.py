@@ -3,7 +3,7 @@ from pico2d import *
 class PowerUp:
     def __init__(self, x, y, powerup_type):
         self.x, self.y = x, y
-        self.width, self.height = 40, 40
+        self.width, self.height = 40, 40  # 크기 설정
         self.powerup_type = powerup_type
         self.image = self.load_image()
         self.is_active = True  # 아이템 활성화 상태
@@ -15,7 +15,7 @@ class PowerUp:
 
     def draw(self, camera_left):
         if self.is_active and self.image:
-            self.image.draw(self.x - camera_left, self.y)
+            self.image.draw(self.x - camera_left, self.y, self.width, self.height)  # 크기를 40x40으로 설정
 
     def get_collision_box(self):
         if not self.is_active:

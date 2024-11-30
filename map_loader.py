@@ -1,11 +1,13 @@
 from block import Block
 from enemy import Enemy
+from powerup import PowerUp
 from map_data import map_data
 
 class MapLoader:
     def __init__(self):
         self.sections = []  # 각 섹션에 대한 블럭 리스트
         self.enemies = []   # 적 객체 리스트
+        self.powerups = []  # 파워업 객체 리스트
         self.load_map()
 
     def load_map(self):
@@ -17,6 +19,7 @@ class MapLoader:
         for section in range(num_sections):
             self.sections.append([])
             self.enemies.append([])
+            self.powerups.append([])
 
         for data in map_data:
             section_index = data["x"] // section_width
@@ -26,6 +29,9 @@ class MapLoader:
             elif data["type"] == "enemy":
                 enemy = Enemy(data["x"] % section_width, data["y"])
                 self.enemies[section_index].append(enemy)
+            elif data["type"] == "powerup":
+                powerup = PowerUp(data["x"] % section_width, data["y"], "mushroom")  # 파워업 유형 추가
+                self.powerups[section_index].append(powerup)
 
     def reset_enemies(self, section):
         # 해당 섹션의 적을 초기 위치로 복구
@@ -33,18 +39,29 @@ class MapLoader:
             for enemy in self.enemies[section]:
                 enemy.reset()
 
+    def reset_powerups(self, section):
+        # 해당 섹션의 파워업을 초기 위치로 복구
+        if 0 <= section < len(self.powerups):
+            for powerup in self.powerups[section]:
+                powerup.is_active = True
+
     def draw(self, section):
         if 0 <= section < len(self.sections):
             for block in self.sections[section]:
                 block.draw(0)  # 화면 고정, 카메라 이동 없음
             for enemy in self.enemies[section]:
                 enemy.draw(0)  # 화면 고정, 카메라 이동 없음
+            for powerup in self.powerups[section]:
+                powerup.draw(0)  # 파워업 표시
 
     def get_blocks(self, section):
         return self.sections[section] if 0 <= section < len(self.sections) else []
 
     def get_enemies(self, section):
         return self.enemies[section] if 0 <= section < len(self.enemies) else []
+
+    def get_powerups(self, section):
+        return self.powerups[section] if 0 <= section < len(self.powerups) else []
 
     def update(self, section, screen_width):
         if 0 <= section < len(self.sections):
