@@ -56,9 +56,11 @@ class Mario:
                 self.jump_speed = 0
                 self.y = block.y + block.height + (25 if self.is_big else 0)  # 큰 마리오는 더 높게 위치
                 break
-            elif collision_side == "bottom":  # 블록 아래에 닿음
+            elif collision_side == "bottom":  # 블록 아래에서 점프 시 블록을 활성화
+                if block.block_type in ["block", "question_block"] and not block.is_activated:
+                    block.activate()  # 블록 활성화
                 self.jump_speed = 0
-                self.y = block.y - (40 if self.is_big else 32)  # 높이에 맞게 위치 조정
+                self.y = block.y - (40 if self.is_big else 32)
                 break
 
         # 적과의 충돌 처리

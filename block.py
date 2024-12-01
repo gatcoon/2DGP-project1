@@ -8,33 +8,30 @@ class Block:
         self.height = height
         self.block_type = block_type
         self.image = self.load_image()
+        self.is_activated = False  # 블록이 활성화되었는지 여부
 
     def load_image(self):
         if self.block_type == "block":
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/block.png')
         elif self.block_type == "question_block":
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/question_block.png')
-        elif self.block_type == "pipe":
-            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/pipe.png')
         elif self.block_type == "solid":
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')
         else:
             return None
 
-    def draw(self, camera_left):
-        # 이미지 표시 생략 (숨김)
-        # if self.image:
-        #     self.image.draw_to_origin(self.x - camera_left * 2.5, self.y, self.width, self.height)
+    def activate(self):
+        # 블록이 활성화될 때 이미지를 변경
+        if not self.is_activated:
+            self.is_activated = True
+            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')
 
-        # 충돌 박스 시각화 (y축으로 10 픽셀 아래에 표시)
-        block_left, block_bottom, block_right, block_top = self.get_collision_box(camera_left)
-        adjusted_bottom = block_bottom - 10  # 사각형을 아래로 10 픽셀 이동
-        adjusted_top = block_top - 10       # 사각형을 아래로 10 픽셀 이동
-        draw_rectangle(block_left, adjusted_bottom, block_right, adjusted_top)
+    def draw(self, camera_left):
+        if self.image:
+            self.image.draw(self.x + 20, self.y + 10, self.width, self.height)
 
     def get_collision_box(self, camera_left):
-        # 실제 충돌 박스 계산 (위치 변경 없음)
-        block_left = self.x - camera_left * 2.5
+        block_left = self.x
         block_bottom = self.y
         block_right = block_left + self.width
         block_top = block_bottom + self.height
