@@ -14,7 +14,6 @@ def main():
     show_title_screen = True
     while show_title_screen:
         clear_canvas()
-        # 타이틀 화면을 창 크기에 맞춰서 그리기
         title_image.draw_to_origin(0, 0, screen_width, screen_height)
         update_canvas()
 
@@ -29,7 +28,7 @@ def main():
     mario = Mario()
     map_loader = MapLoader()
 
-    # 이미지의 가로 길이를 6등분하여 섹션 계산
+    # 이미지의 가로 길이를 배경에 맞춰서 계산
     scale = screen_height / background_image.h
     scaled_width = int(background_image.w * scale)
     section_width = screen_width  # 각 섹션의 화면 크기와 동일하게 설정
@@ -52,8 +51,7 @@ def main():
         def reset_to_section_1():
             nonlocal current_section
             current_section = 0
-            map_loader.reset_enemies(current_section)
-            map_loader.reset_powerups(current_section)  # 파워업 초기화
+            map_loader.reset_enemies(current_section)  # 1번 섹션의 적 초기화
 
         # 마리오 업데이트
         mario.update(
@@ -63,13 +61,16 @@ def main():
             reset_to_section_1
         )
 
+        # 파워업 업데이트
+        for powerup in map_loader.get_powerups(current_section):
+            powerup.update(map_loader.get_blocks(current_section))
+
         # 섹션 이동 처리
         if mario.x >= screen_width:  # 다음 섹션으로 이동
             if current_section < num_sections - 1:  # 마지막 섹션이 아닌 경우
                 current_section += 1
                 mario.x = 0  # 마리오를 화면 왼쪽으로 이동
-                map_loader.reset_enemies(current_section)
-                map_loader.reset_powerups(current_section)  # 새 섹션의 파워업 초기화
+                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
             else:  # 마지막 섹션인 경우 끝에서 멈춤
                 mario.x = screen_width - 1
 
@@ -77,8 +78,7 @@ def main():
             if current_section > 0:  # 첫 섹션이 아닌 경우
                 current_section -= 1
                 mario.x = screen_width  # 마리오를 화면 오른쪽으로 이동
-                map_loader.reset_enemies(current_section)
-                map_loader.reset_powerups(current_section)  # 새 섹션의 파워업 초기화
+                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
             else:  # 첫 섹션인 경우 더 왼쪽으로 못 가게 함
                 mario.x = 1
 
@@ -88,9 +88,9 @@ def main():
         # 적 업데이트 및 그리기
         for enemy in map_loader.get_enemies(current_section):
             enemy.update(map_loader.get_blocks(current_section))
-            enemy.draw(0)  # 카메라 이동 없음
+            enemy.draw(0)
 
-        # 화면에 보이는 파워업 업데이트 및 그리기
+        # 파워업 그리기
         for powerup in map_loader.get_powerups(current_section):
             powerup.draw(0)
 

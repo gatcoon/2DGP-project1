@@ -33,7 +33,7 @@ class Mario:
         self.x += self.velocity * move_speed
 
         # 상태 업데이트 및 프레임 설정
-        if self.is_jumping:
+        if self.is_jumping or self.jump_speed < 0:  # 점프 중이거나 중력으로 하강 중일 때
             self.state = "jump"
             self.frame = 4  # 점프 상태는 4번 프레임
         elif self.velocity != 0:
@@ -53,20 +53,23 @@ class Mario:
                 self.on_ground = True
                 self.is_jumping = False
                 self.jump_speed = 0
-                self.y = block.y + block.height + (25 if self.is_big else 0)
+                # 큰 마리오 위치를 더 높게 설정
+                self.y = block.y + block.height + (25 if self.is_big else 0)  # 25픽셀 추가로 높임
                 break
             elif collision_side == "bottom":
                 self.jump_speed = 0
-                self.y = block.y - (40 if self.is_big else 32)
+                self.y = block.y - (40 if self.is_big else 32)  # 큰 마리오 높이로 조정
                 break
 
         # 적과의 충돌 처리
         for enemy in enemies:
             if self.check_enemy_collision(enemy):
-                if self.is_jumping and self.jump_speed < 0:  # 적을 밟았을 때
-                    self.jump_speed = 10
+                if self.is_invincible:
+                    continue  # 무적 상태에서는 피해를 입지 않음
+                if self.jump_speed < 0:  # 하강 중일 때 적을 밟을 수 있음
+                    self.jump_speed = 10  # 점프 반동
                     enemy.handle_defeat()
-                elif not self.is_invincible:  # 무적 상태가 아닐 때만 데미지를 입음
+                else:  # 적과 충돌
                     if self.is_big:
                         self.is_big = False  # 작은 마리오로 돌아감
                         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
