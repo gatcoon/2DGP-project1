@@ -53,22 +53,20 @@ class Mario:
                 self.on_ground = True
                 self.is_jumping = False
                 self.jump_speed = 0
-                self.y = block.y + block.height
+                self.y = block.y + block.height + (25 if self.is_big else 0)
                 break
             elif collision_side == "bottom":
                 self.jump_speed = 0
-                self.y = block.y - 32
+                self.y = block.y - (40 if self.is_big else 32)
                 break
 
         # 적과의 충돌 처리
         for enemy in enemies:
             if self.check_enemy_collision(enemy):
-                if self.is_invincible:
-                    continue  # 무적 상태에서는 피해를 입지 않음
                 if self.is_jumping and self.jump_speed < 0:  # 적을 밟았을 때
                     self.jump_speed = 10
                     enemy.handle_defeat()
-                else:  # 적과 충돌
+                elif not self.is_invincible:  # 무적 상태가 아닐 때만 데미지를 입음
                     if self.is_big:
                         self.is_big = False  # 작은 마리오로 돌아감
                         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
@@ -116,10 +114,13 @@ class Mario:
             reset_to_section_1()
 
     def check_collision(self, block, next_y):
-        mario_left = self.x - 15
-        mario_right = self.x + 15
-        mario_bottom = next_y - 16
-        mario_top = next_y + 16
+        mario_width = 15 if not self.is_big else 18  # small: 15, big: 18
+        mario_height = 16 if not self.is_big else 32  # small: 16, big: 32
+
+        mario_left = self.x - mario_width
+        mario_right = self.x + mario_width
+        mario_bottom = next_y - mario_height
+        mario_top = next_y + mario_height
 
         block_left, block_bottom, block_right, block_top = block.get_collision_box(0)
 
@@ -136,10 +137,10 @@ class Mario:
         return None
 
     def check_enemy_collision(self, enemy):
-        mario_left = self.x - 15
-        mario_right = self.x + 15
-        mario_bottom = self.y - 16
-        mario_top = self.y + 16
+        mario_left = self.x - (15 if not self.is_big else 20)
+        mario_right = self.x + (15 if not self.is_big else 20)
+        mario_bottom = self.y - (16 if not self.is_big else 40)
+        mario_top = self.y + (16 if not self.is_big else 40)
 
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
@@ -154,10 +155,10 @@ class Mario:
         if not powerup.is_active:
             return False
 
-        mario_left = self.x - 15
-        mario_right = self.x + 15
-        mario_bottom = self.y - 16
-        mario_top = self.y + 16
+        mario_left = self.x - (15 if not self.is_big else 20)
+        mario_right = self.x + (15 if not self.is_big else 20)
+        mario_bottom = self.y - (16 if not self.is_big else 40)
+        mario_top = self.y + (16 if not self.is_big else 40)
 
         powerup_left, powerup_bottom, powerup_right, powerup_top = powerup.get_collision_box()
 
