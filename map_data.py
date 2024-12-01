@@ -33,6 +33,7 @@ map_data = [
     { "x": 1840, "y": 87, "type": "pipe", "width": 80, "height": 165 },
     { "x": 2280, "y": 87, "type": "pipe", "width": 80, "height": 165 },
 
+    { "x": 2100, "y": 100, "type": "enemy" },
     { "x": 2200, "y": 100, "type": "enemy" },
 
     # section 4
@@ -78,7 +79,11 @@ map_data = [
 
     { "x": 4720, "y": 210, "type": "block", "width": 40, "height": 40 },
 
-
+    { "x": 4550, "y": 100, "type": "enemy" },
+    { "x": 4600, "y": 100, "type": "enemy" },
+    { "x": 4650, "y": 100, "type": "enemy" },
+    { "x": 4700, "y": 100, "type": "enemy" },
+    { "x": 4750, "y": 100, "type": "enemy" },
 
     # section 7
     { "x": 4800, "y": 0, "type": "invisible", "width": 3000, "height": 90 },
@@ -104,6 +109,8 @@ map_data = [
     { "x": 5480, "y": 130, "type": "solid", "width": 40, "height": 40},
     { "x": 5480, "y": 90, "type": "solid", "width": 40, "height": 40},
 
+    { "x": 5150, "y": 100, "type": "enemy" },
+    { "x": 5300, "y": 100, "type": "enemy" },
     # section 8
     { "x": 5600, "y": 0, "type": "invisible", "width": 520, "height": 90 },
     { "x": 6200, "y": 0, "type": "invisible", "width": 200, "height": 90 },
@@ -133,6 +140,8 @@ map_data = [
     { "x": 6280, "y": 130, "type": "solid", "width": 40, "height": 40},
     { "x": 6320, "y": 90, "type": "solid", "width": 40, "height": 40},
 
+    { "x": 5820, "y": 100, "type": "enemy" },
+
     # section 9
     { "x": 6400, "y": 0, "type": "invisible", "width": 3000, "height": 90 },
 
@@ -145,6 +154,9 @@ map_data = [
     { "x": 6520, "y": 87, "type": "pipe", "width": 80, "height": 80 },
     { "x": 7160, "y": 87, "type": "pipe", "width": 80, "height": 80 },
 
+    { "x": 6800, "y": 100, "type": "enemy" },
+    { "x": 6900, "y": 100, "type": "enemy" },
+    { "x": 7000, "y": 100, "type": "enemy" },
 
     # section 10
     { "x": 7200, "y": 0, "type": "invisible", "width": 3000, "height": 90 },
