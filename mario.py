@@ -3,6 +3,7 @@ from time import time  # 시간 측정을 위해 사용
 
 class Mario:
     def __init__(self):
+        # 초기 설정
         self.x, self.y = 300, 100
         self.velocity = 0
         self.jump_speed = 0
@@ -10,38 +11,38 @@ class Mario:
         self.gravity = 1.8
         self.frame = 0
         self.facing_direction = 1
-        self.state = "idle"
+        self.state = "idle"  # 상태: "idle", "walk", "jump", "death"
         self.is_big = False  # 파워업 상태를 나타내는 플래그
         self.is_invincible = False  # 무적 상태 여부
         self.invincible_start_time = 0  # 무적 상태 시작 시간
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')  # 작은 마리오 기본 스프라이트
         self.on_ground = False
         self.running = False
         self.is_dead = False
 
     def update(self, blocks, enemies, powerups, reset_to_section_1):
         if self.is_dead:
-            self.handle_death(reset_to_section_1)
+            self.handle_death(reset_to_section_1)  # 사망 처리
             return
 
-        # 무적 상태가 끝났는지 확인
+        # 무적 상태 지속 시간 확인
         if self.is_invincible and time() - self.invincible_start_time > 2:
-            self.is_invincible = False
+            self.is_invincible = False  # 무적 상태 해제
 
         # 이동 처리
-        move_speed = 1.4 if not self.running else 2.5
+        move_speed = 1.4 if not self.running else 2.5  # 걷기/달리기 속도
         self.x += self.velocity * move_speed
 
         # 상태 업데이트 및 프레임 설정
-        if self.is_jumping or self.jump_speed < 0:  # 점프 중이거나 중력으로 하강 중일 때
+        if self.is_jumping:  # 점프 상태
             self.state = "jump"
-            self.frame = 4  # 점프 상태는 4번 프레임
-        elif self.velocity != 0:
+            self.frame = 4  # 점프 프레임
+        elif self.velocity != 0:  # 걷기 상태
             self.state = "walk"
-            self.frame = (self.frame + 1) % 3 + 1  # 걷기 상태는 1, 2, 3 순환
-        else:
+            self.frame = (self.frame + 1) % 3 + 1  # 걷기 애니메이션: 1, 2, 3
+        else:  # 대기 상태
             self.state = "idle"
-            self.frame = 0  # 대기 상태는 0번 프레임
+            self.frame = 0  # 대기 프레임
 
         # 중력 및 충돌 처리
         self.on_ground = False
@@ -49,42 +50,41 @@ class Mario:
 
         for block in blocks:
             collision_side = self.check_collision(block, next_y)
-            if collision_side == "top":
+            if collision_side == "top":  # 블록 위에 닿음
                 self.on_ground = True
                 self.is_jumping = False
                 self.jump_speed = 0
-                # 큰 마리오 위치를 더 높게 설정
-                self.y = block.y + block.height + (25 if self.is_big else 0)  # 25픽셀 추가로 높임
+                self.y = block.y + block.height + (25 if self.is_big else 0)  # 큰 마리오는 더 높게 위치
                 break
-            elif collision_side == "bottom":
+            elif collision_side == "bottom":  # 블록 아래에 닿음
                 self.jump_speed = 0
-                self.y = block.y - (40 if self.is_big else 32)  # 큰 마리오 높이로 조정
+                self.y = block.y - (40 if self.is_big else 32)  # 높이에 맞게 위치 조정
                 break
 
         # 적과의 충돌 처리
         for enemy in enemies:
-            if self.check_enemy_collision(enemy):
+            if self.check_enemy_collision(enemy):  # 적과의 충돌 감지
                 if self.is_invincible:
-                    continue  # 무적 상태에서는 피해를 입지 않음
-                if self.jump_speed < 0:  # 하강 중일 때 적을 밟을 수 있음
-                    self.jump_speed = 10  # 점프 반동
-                    enemy.handle_defeat()
-                else:  # 적과 충돌
-                    if self.is_big:
-                        self.is_big = False  # 작은 마리오로 돌아감
+                    continue  # 무적 상태에서는 데미지 무시
+                if self.jump_speed < 0:  # 떨어지면서 적을 밟을 경우
+                    self.jump_speed = 10  # 튕겨 오름
+                    enemy.handle_defeat()  # 적 제거 처리
+                else:  # 적에게 데미지를 입음
+                    if self.is_big:  # 큰 마리오 상태일 경우
+                        self.is_big = False
                         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
                         self.is_invincible = True  # 무적 상태로 전환
                         self.invincible_start_time = time()  # 무적 상태 시작 시간 기록
-                    else:
+                    else:  # 작은 마리오일 경우 사망
                         self.state = "death"
                         self.is_dead = True
-                        self.frame = 5  # 사망 프레임 설정
+                        self.frame = 5  # 사망 프레임
                         self.jump_speed = 30
                         break
 
         # 파워업 아이템 충돌 처리
         for powerup in powerups:
-            if self.check_powerup_collision(powerup):
+            if self.check_powerup_collision(powerup):  # 아이템 충돌 감지
                 self.handle_powerup(powerup)
 
         # 중력 적용
@@ -102,10 +102,10 @@ class Mario:
             self.jump_speed = 30
 
     def handle_powerup(self, powerup):
-        if powerup.powerup_type == "mushroom":
+        if powerup.powerup_type == "mushroom":  # 버섯 아이템 처리
             self.is_big = True
-            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')  # 스프라이트 변경
-            powerup.is_active = False  # 파워업 비활성화
+            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
+            powerup.is_active = False  # 아이템 비활성화
 
     def handle_death(self, reset_to_section_1):
         self.y += self.jump_speed
@@ -117,8 +117,8 @@ class Mario:
             reset_to_section_1()
 
     def check_collision(self, block, next_y):
-        mario_width = 15 if not self.is_big else 18  # small: 15, big: 18
-        mario_height = 16 if not self.is_big else 32  # small: 16, big: 32
+        mario_width = 15 if not self.is_big else 18
+        mario_height = 16 if not self.is_big else 32
 
         mario_left = self.x - mario_width
         mario_right = self.x + mario_width
@@ -147,12 +147,24 @@ class Mario:
 
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
-        return (
+        current_collision = (
             mario_left < enemy_right
             and mario_right > enemy_left
             and mario_bottom < enemy_top
             and mario_top > enemy_bottom
         )
+
+        previous_bottom = self.y + self.jump_speed - (16 if not self.is_big else 40)
+        previous_top = self.y + self.jump_speed + (16 if not self.is_big else 40)
+
+        previous_collision = (
+            mario_left < enemy_right
+            and mario_right > enemy_left
+            and previous_bottom < enemy_top
+            and previous_top > enemy_bottom
+        )
+
+        return current_collision or previous_collision
 
     def check_powerup_collision(self, powerup):
         if not powerup.is_active:
@@ -206,23 +218,22 @@ class Mario:
                 self.running = False
 
     def draw(self):
-        frame_width_small = 17  # small_mario의 프레임 폭
-        frame_width_big = 99 // 5  # big_mario의 프레임 폭 (5등분)
-        output_width = 34 if not self.is_big else 40  # 화면 출력 가로 크기
-        output_height = 32 if not self.is_big else 80  # small: 32, big: 80
+        frame_width_small = 17
+        frame_width_big = 99 // 5
+        output_width = 34 if not self.is_big else 40
+        output_height = 32 if not self.is_big else 80
         frame_width = frame_width_small if not self.is_big else frame_width_big
 
-        # 무적 상태 깜빡임 효과
         if self.is_invincible and int(time() * 10) % 2 == 0:
-            return  # 짝수 프레임에서 마리오를 그리지 않음
+            return
 
         if self.facing_direction == 1:
             self.image.clip_draw(
-                self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,  # 이미지의 프레임 크기
-                self.x, self.y, output_width, output_height  # 출력 크기
+                self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,
+                self.x, self.y, output_width, output_height
             )
         else:
             self.image.clip_composite_draw(
-                self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,  # 이미지의 프레임 크기
-                0, 'h', self.x, self.y, output_width, output_height  # 좌우 반전
+                self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,
+                0, 'h', self.x, self.y, output_width, output_height
             )
