@@ -2,13 +2,25 @@ from pico2d import *
 from mario import Mario
 from map_loader import MapLoader
 
+class FixedBackground:
+    def __init__(self):
+        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/stage_1_1.png')
+        self.bgm = load_music('C:/Githup_2024_2/2DGP-project1/sounds/01. Ground Theme.mp3')
+        self.bgm.set_volume(32)
+        self.bgm.repeat_play()
+
+    def draw(self, section_start, scaled_width, screen_height):
+        self.image.draw_to_origin(-section_start, 0, scaled_width, screen_height)
+
 def main():
     open_canvas(800, 600)
 
     # 타이틀 화면 로드
     title_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/title.png')
     screen_width, screen_height = 800, 600
-    background_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/stage_1_1.png')
+
+    # 배경 및 음악
+    background = FixedBackground()
 
     # 타이틀 화면 표시
     show_title_screen = True
@@ -29,10 +41,10 @@ def main():
     map_loader = MapLoader()
 
     # 이미지의 가로 길이를 배경에 맞춰서 계산
-    scale = screen_height / background_image.h
-    scaled_width = int(background_image.w * scale)
-    section_width = screen_width  # 각 섹션의 화면 크기와 동일하게 설정
-    num_sections = scaled_width // section_width  # 전체 섹션 개수
+    scale = screen_height / background.image.h
+    scaled_width = int(background.image.w * scale)
+    section_width = screen_width
+    num_sections = scaled_width // section_width
     current_section = 0
 
     running = True
@@ -43,7 +55,7 @@ def main():
         section_start = current_section * section_width
 
         # 배경 그리기 (현재 섹션만 표시)
-        background_image.draw_to_origin(-section_start, 0, scaled_width, screen_height)
+        background.draw(section_start, scaled_width, screen_height)
 
         # 맵 데이터 그리기 (현재 섹션의 블럭 및 적 표시)
         map_loader.draw(current_section)
@@ -51,13 +63,13 @@ def main():
         def reset_to_section_1():
             nonlocal current_section
             current_section = 0
-            map_loader.reset_enemies(current_section)  # 1번 섹션의 적 초기화
+            map_loader.reset_enemies(current_section)
 
         # 마리오 업데이트
         mario.update(
             map_loader.get_blocks(current_section),
             map_loader.get_enemies(current_section),
-            map_loader.get_powerups(current_section),  # 파워업 추가
+            map_loader.get_powerups(current_section),
             reset_to_section_1
         )
 
@@ -66,20 +78,19 @@ def main():
             powerup.update(map_loader.get_blocks(current_section))
 
         # 섹션 이동 처리
-        if mario.x >= screen_width:  # 다음 섹션으로 이동
-            if current_section < num_sections - 1:  # 마지막 섹션이 아닌 경우
+        if mario.x >= screen_width:
+            if current_section < num_sections - 1:
                 current_section += 1
-                mario.x = 0  # 마리오를 화면 왼쪽으로 이동
-                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
-            else:  # 마지막 섹션인 경우 끝에서 멈춤
+                mario.x = 0
+                map_loader.reset_enemies(current_section)
+            else:
                 mario.x = screen_width - 1
-
-        elif mario.x <= 0:  # 이전 섹션으로 이동
-            if current_section > 0:  # 첫 섹션이 아닌 경우
+        elif mario.x <= 0:
+            if current_section > 0:
                 current_section -= 1
-                mario.x = screen_width  # 마리오를 화면 오른쪽으로 이동
-                map_loader.reset_enemies(current_section)  # 새 섹션의 적 초기화
-            else:  # 첫 섹션인 경우 더 왼쪽으로 못 가게 함
+                mario.x = screen_width
+                map_loader.reset_enemies(current_section)
+            else:
                 mario.x = 1
 
         # 마리오 그리기

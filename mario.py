@@ -1,9 +1,8 @@
 from pico2d import *
-from time import time  # 시간 측정을 위해 사용
+from time import time
 
 class Mario:
     def __init__(self):
-        # 초기 설정
         self.x, self.y = 300, 100
         self.velocity = 0
         self.jump_speed = 0
@@ -11,38 +10,57 @@ class Mario:
         self.gravity = 1.8
         self.frame = 0
         self.facing_direction = 1
-        self.state = "idle"  # 상태: "idle", "walk", "jump", "death"
-        self.is_big = False  # 파워업 상태를 나타내는 플래그
-        self.is_invincible = False  # 무적 상태 여부
-        self.invincible_start_time = 0  # 무적 상태 시작 시간
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')  # 작은 마리오 기본 스프라이트
+        self.state = "idle"
+        self.is_big = False
+        self.is_invincible = False
+        self.invincible_start_time = 0
+        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
         self.on_ground = False
         self.running = False
         self.is_dead = False
 
+        # 효과음 로드
+        self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
+        self.small_jump_sound.set_volume(32)
+
+        self.super_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-super.wav')
+        self.super_jump_sound.set_volume(32)
+
+        self.powerup_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_powerup.wav')
+        self.powerup_sound.set_volume(32)
+
+        self.stomp_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_stomp.wav')
+        self.stomp_sound.set_volume(32)
+
+        self.block_hit_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
+        self.block_hit_sound.set_volume(32)
+
+        self.death_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_mariodie.mp3')
+        self.death_sound.set_volume(32)
+
     def update(self, blocks, enemies, powerups, reset_to_section_1):
         if self.is_dead:
-            self.handle_death(reset_to_section_1)  # 사망 처리
+            self.handle_death(reset_to_section_1)
             return
 
         # 무적 상태 지속 시간 확인
         if self.is_invincible and time() - self.invincible_start_time > 2:
-            self.is_invincible = False  # 무적 상태 해제
+            self.is_invincible = False
 
         # 이동 처리
-        move_speed = 1.4 if not self.running else 2.5  # 걷기/달리기 속도
+        move_speed = 1.4 if not self.running else 2.5
         self.x += self.velocity * move_speed
 
         # 상태 업데이트 및 프레임 설정
-        if self.is_jumping:  # 점프 상태
+        if self.is_jumping:
             self.state = "jump"
-            self.frame = 4  # 점프 프레임
-        elif self.velocity != 0:  # 걷기 상태
+            self.frame = 4
+        elif self.velocity != 0:
             self.state = "walk"
-            self.frame = (self.frame + 1) % 3 + 1  # 걷기 애니메이션: 1, 2, 3
-        else:  # 대기 상태
+            self.frame = (self.frame + 1) % 3 + 1
+        else:
             self.state = "idle"
-            self.frame = 0  # 대기 프레임
+            self.frame = 0
 
         # 중력 및 충돌 처리
         self.on_ground = False
@@ -50,43 +68,46 @@ class Mario:
 
         for block in blocks:
             collision_side = self.check_collision(block, next_y)
-            if collision_side == "top":  # 블록 위에 닿음
+            if collision_side == "top":
                 self.on_ground = True
                 self.is_jumping = False
                 self.jump_speed = 0
-                self.y = block.y + block.height + (25 if self.is_big else 0)  # 큰 마리오는 더 높게 위치
+                self.y = block.y + block.height + (25 if self.is_big else 0)
                 break
-            elif collision_side == "bottom":  # 블록 아래에서 점프 시 블록을 활성화
+            elif collision_side == "bottom":
                 if block.block_type in ["block", "question_block"] and not block.is_activated:
-                    block.activate()  # 블록 활성화
+                    block.activate()
+                    self.block_hit_sound.play()  # 블럭 히트 소리 재생
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
 
         # 적과의 충돌 처리
         for enemy in enemies:
-            if self.check_enemy_collision(enemy):  # 적과의 충돌 감지
+            if self.check_enemy_collision(enemy):
                 if self.is_invincible:
-                    continue  # 무적 상태에서는 데미지 무시
-                if self.jump_speed < 0:  # 떨어지면서 적을 밟을 경우
-                    self.jump_speed = 10  # 튕겨 오름
-                    enemy.handle_defeat()  # 적 제거 처리
-                else:  # 적에게 데미지를 입음
-                    if self.is_big:  # 큰 마리오 상태일 경우
+                    continue
+                if self.jump_speed < 0:
+                    self.jump_speed = 10
+                    enemy.handle_defeat()
+                    self.stomp_sound.play()  # 적을 밟을 때 소리 재생
+                else:
+                    if self.is_big:
                         self.is_big = False
                         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
-                        self.is_invincible = True  # 무적 상태로 전환
-                        self.invincible_start_time = time()  # 무적 상태 시작 시간 기록
-                    else:  # 작은 마리오일 경우 사망
+                        self.is_invincible = True
+                        self.invincible_start_time = time()
+                    else:
                         self.state = "death"
                         self.is_dead = True
-                        self.frame = 5  # 사망 프레임
+                        self.frame = 5
                         self.jump_speed = 30
+                        self.death_sound.play()  # 사망 시 음악 재생
                         break
 
         # 파워업 아이템 충돌 처리
         for powerup in powerups:
-            if self.check_powerup_collision(powerup):  # 아이템 충돌 감지
+            if self.check_powerup_collision(powerup):
                 self.handle_powerup(powerup)
 
         # 중력 적용
@@ -98,16 +119,18 @@ class Mario:
         if self.y < -50:
             self.state = "death"
             self.is_dead = True
-            self.is_big = False  # 낙사 시 항상 작은 마리오로 변경
+            self.is_big = False
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
             self.frame = 5
             self.jump_speed = 30
+            self.death_sound.play()
 
     def handle_powerup(self, powerup):
-        if powerup.powerup_type == "mushroom":  # 버섯 아이템 처리
+        if powerup.powerup_type == "mushroom":
             self.is_big = True
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
-            powerup.is_active = False  # 아이템 비활성화
+            powerup.is_active = False
+            self.powerup_sound.play()
 
     def handle_death(self, reset_to_section_1):
         self.y += self.jump_speed
@@ -115,7 +138,7 @@ class Mario:
 
         if self.y < -100:
             self.reset_position()
-            delay(0.5)
+            delay(1.0)
             reset_to_section_1()
 
     def check_collision(self, block, next_y):
@@ -209,6 +232,10 @@ class Mario:
                 self.is_jumping = True
                 self.jump_speed = 25
                 self.on_ground = False
+                if self.is_big:
+                    self.super_jump_sound.play()
+                else:
+                    self.small_jump_sound.play()
             elif event.key == SDLK_z:
                 self.running = True
         elif event.type == SDL_KEYUP:
