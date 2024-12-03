@@ -38,6 +38,9 @@ class Mario:
         self.death_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_mariodie.mp3')
         self.death_sound.set_volume(32)
 
+        self.damage_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.mp3')
+        self.damage_sound.set_volume(32)
+
     def update(self, blocks, enemies, powerups, reset_to_section_1):
         if self.is_dead:
             self.handle_death(reset_to_section_1)
@@ -85,18 +88,17 @@ class Mario:
         # 적과의 충돌 처리
         for enemy in enemies:
             if self.check_enemy_collision(enemy):
-                if self.is_invincible:
-                    continue
-                if self.jump_speed < 0:
+                if self.jump_speed < 0:  # 적을 밟을 때
                     self.jump_speed = 10
                     enemy.handle_defeat()
                     self.stomp_sound.play()  # 적을 밟을 때 소리 재생
-                else:
+                elif not self.is_invincible:  # 무적 상태가 아닐 때만 데미지 처리
                     if self.is_big:
                         self.is_big = False
                         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
                         self.is_invincible = True
                         self.invincible_start_time = time()
+                        self.damage_sound.play()  # 데미지 소리 재생
                     else:
                         self.state = "death"
                         self.is_dead = True
