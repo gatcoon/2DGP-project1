@@ -12,6 +12,11 @@ class FixedBackground:
     def draw(self, section_start, scaled_width, screen_height):
         self.image.draw_to_origin(-section_start, 0, scaled_width, screen_height)
 
+    def restart_music(self):
+        self.bgm.stop()  # 음악을 중단
+        self.bgm.repeat_play()  # 음악을 다시 재생
+
+
 def main():
     open_canvas(800, 600)
 
@@ -47,6 +52,13 @@ def main():
     num_sections = scaled_width // section_width
     current_section = 0
 
+    def reset_to_section_1():
+        nonlocal current_section
+        current_section = 0
+        mario.reset_position()
+        map_loader.reset_map()
+        background.restart_music()  # 배경음악을 다시 재생
+
     running = True
     while running:
         clear_canvas()
@@ -59,11 +71,6 @@ def main():
 
         # 맵 데이터 그리기 (현재 섹션의 블럭 및 적 표시)
         map_loader.draw(current_section)
-
-        def reset_to_section_1():
-            nonlocal current_section
-            current_section = 0
-            map_loader.reset_enemies(current_section)
 
         # 마리오 업데이트
         mario.update(

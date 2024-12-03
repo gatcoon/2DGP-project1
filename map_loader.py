@@ -33,6 +33,13 @@ class MapLoader:
                 powerup = PowerUp(data["x"] % section_width, data["y"], "mushroom")  # 파워업 유형 추가
                 self.powerups[section_index].append(powerup)
 
+    def reset_map(self):
+        """맵을 초기 상태로 리셋"""
+        self.sections = []  # 섹션 초기화
+        self.enemies = []   # 적 리스트 초기화
+        self.powerups = []  # 파워업 리스트 초기화
+        self.load_map()     # 맵 데이터 다시 로드
+
     def reset_enemies(self, section):
         # 해당 섹션의 적을 초기 위치로 복구
         if 0 <= section < len(self.enemies):
@@ -62,9 +69,3 @@ class MapLoader:
 
     def get_powerups(self, section):
         return self.powerups[section] if 0 <= section < len(self.powerups) else []
-
-    def update(self, section, screen_width):
-        if 0 <= section < len(self.sections):
-            for enemy in self.enemies[section]:
-                if not enemy.update(self.sections[section], screen_width):
-                    self.enemies[section].remove(enemy)  # 적 제거

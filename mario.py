@@ -138,7 +138,7 @@ class Mario:
 
         if self.y < -100:
             self.reset_position()
-            delay(1.0)
+            delay(2.0)
             reset_to_section_1()
 
     def check_collision(self, block, next_y):
