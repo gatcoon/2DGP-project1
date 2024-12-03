@@ -16,10 +16,9 @@ class MapLoader:
         num_sections = max(data["x"] // section_width for data in map_data) + 1
 
         # 섹션 초기화
-        for section in range(num_sections):
-            self.sections.append([])
-            self.enemies.append([])
-            self.powerups.append([])
+        self.sections = [[] for _ in range(num_sections)]
+        self.enemies = [[] for _ in range(num_sections)]
+        self.powerups = [[] for _ in range(num_sections)]
 
         for data in map_data:
             section_index = data["x"] // section_width
@@ -35,10 +34,7 @@ class MapLoader:
 
     def reset_map(self):
         """맵을 초기 상태로 리셋"""
-        self.sections = []  # 섹션 초기화
-        self.enemies = []   # 적 리스트 초기화
-        self.powerups = []  # 파워업 리스트 초기화
-        self.load_map()     # 맵 데이터 다시 로드
+        self.load_map()
 
     def reset_enemies(self, section):
         # 해당 섹션의 적을 초기 위치로 복구
