@@ -1,6 +1,7 @@
 from pico2d import *
 from time import time
 
+
 class Mario:
     def __init__(self):
         self.x, self.y = 300, 100
@@ -68,9 +69,10 @@ class Mario:
         # 중력 및 충돌 처리
         self.on_ground = False
         next_y = self.y + self.jump_speed
+        next_x = self.x + self.velocity
 
         for block in blocks:
-            collision_side = self.check_collision(block, next_y)
+            collision_side = self.check_collision(block, next_x, next_y)
             if collision_side == "top":
                 self.on_ground = True
                 self.is_jumping = False
@@ -84,6 +86,12 @@ class Mario:
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
+            elif collision_side == "left":
+                self.velocity = 0
+                self.x = block.x - (15 if not self.is_big else 18)  # 왼쪽에서 충돌
+            elif collision_side == "right":
+                self.velocity = 0
+                self.x = block.x + block.width + (15 if not self.is_big else 18)  # 오른쪽에서 충돌
 
         # 적과의 충돌 처리
         for enemy in enemies:
@@ -143,12 +151,12 @@ class Mario:
             delay(2.0)
             reset_to_section_1()
 
-    def check_collision(self, block, next_y):
+    def check_collision(self, block, next_x, next_y):
         mario_width = 15 if not self.is_big else 18
         mario_height = 16 if not self.is_big else 32
 
-        mario_left = self.x - mario_width
-        mario_right = self.x + mario_width
+        mario_left = next_x - mario_width
+        mario_right = next_x + mario_width
         mario_bottom = next_y - mario_height
         mario_top = next_y + mario_height
 
@@ -164,6 +172,10 @@ class Mario:
                 return "bottom"
             elif mario_top > block_bottom and self.jump_speed <= 0:
                 return "top"
+            elif mario_left < block_right and self.velocity > 0:
+                return "right"
+            elif mario_right > block_left and self.velocity < 0:
+                return "left"
         return None
 
     def check_enemy_collision(self, enemy):
@@ -174,24 +186,12 @@ class Mario:
 
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
-        current_collision = (
+        return (
             mario_left < enemy_right
             and mario_right > enemy_left
             and mario_bottom < enemy_top
             and mario_top > enemy_bottom
         )
-
-        previous_bottom = self.y + self.jump_speed - (16 if not self.is_big else 40)
-        previous_top = self.y + self.jump_speed + (16 if not self.is_big else 40)
-
-        previous_collision = (
-            mario_left < enemy_right
-            and mario_right > enemy_left
-            and previous_bottom < enemy_top
-            and previous_top > enemy_bottom
-        )
-
-        return current_collision or previous_collision
 
     def check_powerup_collision(self, powerup):
         if not powerup.is_active:
