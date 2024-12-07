@@ -1,5 +1,8 @@
 from pico2d import *
 
+from powerup import PowerUp
+
+
 class Block:
     def __init__(self, x, y, width, height, block_type):
         self.x = x
@@ -10,6 +13,7 @@ class Block:
         self.initial_type = block_type  # 초기 타입 저장
         self.image = self.load_image()
         self.is_activated = False  # 블록이 활성화되었는지 여부
+        self.contains_powerup = (x == 640 and y == 210)  # 특정 위치의 블럭만 파워업 생성
 
     def load_image(self):
         """블록 타입에 따른 이미지를 로드."""
@@ -21,12 +25,16 @@ class Block:
             return load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')
         return None
 
-    def activate(self):
+    def activate(self, map_loader):
         """블록이 활성화되었을 때 호출."""
         if not self.is_activated and self.block_type in ["block", "question_block"]:
             self.is_activated = True
             self.block_type = "solid"  # 타입을 solid로 변경
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')  # 이미지 변경
+
+            # 특정 블럭인 경우 파워업 생성
+            if self.contains_powerup:
+                map_loader.add_powerup(PowerUp(self.x, self.y + self.height, "mushroom"))
 
     def reset(self):
         """블록을 초기 상태로 복구."""

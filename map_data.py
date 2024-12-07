@@ -6,8 +6,6 @@ map_data = [
 
     { "x": 640, "y": 210, "type": "question_block", "width": 40, "height": 40 },
 
-    { "x": 640, "y": 100, "type": "enemy" },
-
     { "x": 400, "y": 200, "type": "coin" },
     { "x": 450, "y": 250, "type": "coin" },
     { "x": 500, "y": 200, "type": "coin" },

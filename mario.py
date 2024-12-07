@@ -1,6 +1,8 @@
 from pico2d import *
 from time import time
 
+import map_loader
+
 
 class Mario:
     def __init__(self):
@@ -45,7 +47,7 @@ class Mario:
         self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
         self.coin_sound.set_volume(16)
 
-    def update(self, blocks, enemies, powerups, coins, reset_to_section_1):
+    def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
         if self.is_dead:
             self.handle_death(reset_to_section_1)
             return
@@ -83,8 +85,7 @@ class Mario:
                 break
             elif collision_side == "bottom":
                 if block.block_type in ["block", "question_block"] and not block.is_activated:
-                    block.activate()
-                    self.block_hit_sound.play()  # 블럭 히트 소리 재생
+                    block.activate(map_loader)  # map_loader 전달
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
@@ -131,7 +132,7 @@ class Mario:
         if not self.on_ground:
             self.y += self.jump_speed
             self.jump_speed -= self.gravity
-            self.jump_speed = max(self.jump_speed, -18)  # 낙하 속도를 -15로 제한
+            self.jump_speed = max(self.jump_speed, -18)  # 낙하 속도를 -18로 제한
 
         # 낙사 처리
         if self.y < -50:
@@ -183,11 +184,13 @@ class Mario:
         return None
 
     def check_enemy_collision(self, enemy):
+        # 마리오의 충돌 박스
         mario_left = self.x - (15 if not self.is_big else 20)
         mario_right = self.x + (15 if not self.is_big else 20)
         mario_bottom = self.y - (16 if not self.is_big else 40)
         mario_top = self.y + (16 if not self.is_big else 40)
 
+        # 적의 충돌 박스
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
         # 충돌 여부 확인
@@ -198,8 +201,8 @@ class Mario:
                 and mario_top > enemy_bottom
         )
 
-        # 점프 상태에서 적과 충돌하면 "점프"로 판정
-        if is_colliding and self.is_jumping:
+        # 점프 상태에서 적 위쪽을 밟는 경우 판정
+        if is_colliding and self.is_jumping and mario_bottom < enemy_top:
             return "stomp"
 
         # 점프가 아닌 상태에서의 일반 충돌

@@ -78,7 +78,8 @@ def main():
             map_loader.get_enemies(current_section),
             map_loader.get_powerups(current_section),
             map_loader.get_coins(current_section),
-            reset_to_section_1
+            reset_to_section_1,
+            map_loader  # map_loader 전달
         )
 
         # 파워업 업데이트

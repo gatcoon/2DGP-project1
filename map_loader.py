@@ -93,3 +93,9 @@ class MapLoader:
 
     def get_coins(self, section):
         return self.coins[section] if 0 <= section < len(self.coins) else []
+
+    def add_powerup(self, powerup):
+        """현재 섹션에 파워업 추가"""
+        section_index = powerup.x // 800
+        if 0 <= section_index < len(self.powerups):
+            self.powerups[section_index].append(powerup)
