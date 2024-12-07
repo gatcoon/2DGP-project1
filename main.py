@@ -85,6 +85,10 @@ def main():
         for powerup in map_loader.get_powerups(current_section):
             powerup.update(map_loader.get_blocks(current_section))
 
+        # 동전 애니메이션 업데이트
+        for coin in map_loader.get_coins(current_section):
+            coin.update()
+
         # 섹션 이동 처리
         if mario.x >= screen_width:
             if current_section < num_sections - 1:
@@ -112,6 +116,10 @@ def main():
         # 파워업 그리기
         for powerup in map_loader.get_powerups(current_section):
             powerup.draw(0)
+
+        # 동전 그리기
+        for coin in map_loader.get_coins(current_section):
+            coin.draw(0)
 
         update_canvas()
 
