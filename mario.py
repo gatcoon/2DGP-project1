@@ -24,10 +24,10 @@ class Mario:
 
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
-        self.small_jump_sound.set_volume(32)
+        self.small_jump_sound.set_volume(26)
 
         self.super_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-super.wav')
-        self.super_jump_sound.set_volume(32)
+        self.super_jump_sound.set_volume(26)
 
         self.powerup_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_powerup.wav')
         self.powerup_sound.set_volume(32)
@@ -46,6 +46,9 @@ class Mario:
 
         self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
         self.coin_sound.set_volume(16)
+
+        self.break_block_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smw_break_block.wav')
+        self.break_block_sound.set_volume(50)  # 볼륨 설정
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
         if self.is_dead:
@@ -85,7 +88,8 @@ class Mario:
                 break
             elif collision_side == "bottom":
                 if block.block_type in ["block", "question_block"] and not block.is_activated:
-                    block.activate(map_loader)  # map_loader 전달
+                    block.activate(map_loader)  # 블럭 활성화
+                    self.break_block_sound.play()  # 블럭 소리 재생
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
