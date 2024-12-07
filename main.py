@@ -94,7 +94,7 @@ def main():
                 ):
                     print("Goal Reached!")
                     flag.is_active = False
-                    mario.grab_flag(mario.is_big)  # 깃발 잡기 동작 호출
+                    mario.grab_flag(mario.is_big, flag.x)  # 깃발 x 좌표 전달
 
         # 파워업 업데이트
         for powerup in map_loader.get_powerups(current_section):

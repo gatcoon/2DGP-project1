@@ -320,7 +320,7 @@ class Mario:
 
         if self.on_flag:
             # 깃발 동작일 때 별도 이미지 출력
-            self.flag_image.draw(self.x, self.y, 34 if not self.is_big else 40, 80)
+            self.flag_image.draw(self.x, self.y, 34 if not self.is_big else 40, 32if not self.is_big else 80)
             return
 
         if self.is_invincible and int(time() * 10) % 2 == 0:
@@ -337,11 +337,12 @@ class Mario:
                 0, 'h', self.x, self.y, output_width, output_height
             )
 
-    def grab_flag(self, is_big):
+    def grab_flag(self, is_big, flag_x):
         """깃발을 잡았을 때 호출."""
         self.on_flag = True
         self.velocity = 0  # 이동 중지
         self.state = "flag"  # 상태 전환
+        self.x = flag_x  # x 좌표를 깃발의 x로 이동
         self.flag_image = load_image(
             'C:/Githup_2024_2/2DGP-project1/sprites/big_mario_flag_grab.png' if is_big
             else 'C:/Githup_2024_2/2DGP-project1/sprites/small_mario_flag_grab.png'
