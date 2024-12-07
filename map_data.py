@@ -26,7 +26,6 @@ map_data = [
 
     { "x": 1300, "y": 100, "type": "enemy" },
 
-    { "x": 900, "y": 150, "type": "powerup", "width": 40, "height": 40 },
 
     { "x": 1140, "y": 200, "type": "coin" },
     { "x": 1180, "y": 200, "type": "coin" },
