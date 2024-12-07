@@ -63,7 +63,7 @@ class Mario:
         if self.on_flag:
             # 깃발 동작 처리
             if self.y > self.flag_target_y:
-                self.y -= 2  # 천천히 내려오기
+                self.y -= 5  # 천천히 내려오기
             return  # 다른 동작은 무시
 
         # 무적 상태 지속 시간 확인
@@ -337,12 +337,21 @@ class Mario:
                 0, 'h', self.x, self.y, output_width, output_height
             )
 
-    def grab_flag(self, is_big, flag_x):
+    def grab_flag(self, is_big, flag_x, background):
         """깃발을 잡았을 때 호출."""
         self.on_flag = True
         self.velocity = 0  # 이동 중지
         self.state = "flag"  # 상태 전환
         self.x = flag_x  # x 좌표를 깃발의 x로 이동
+
+        # 배경음악 중지
+        background.bgm.stop()
+
+        # 깃발 사운드 재생
+        self.flagpole_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_flagpole.wav')
+        self.flagpole_sound.set_volume(32)
+        self.flagpole_sound.play()
+
         self.flag_image = load_image(
             'C:/Githup_2024_2/2DGP-project1/sprites/big_mario_flag_grab.png' if is_big
             else 'C:/Githup_2024_2/2DGP-project1/sprites/small_mario_flag_grab.png'
