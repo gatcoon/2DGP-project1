@@ -40,6 +40,7 @@ map_data = [
     { "x": 2400, "y": 0, "type": "invisible", "width": 360, "height": 90 },
     { "x": 2840, "y": 0, "type": "invisible", "width": 360, "height": 90 },
 
+    { "x": 2560, "y": 250, "type": "block", "width": 40, "height": 40 },
 
     { "x": 3080, "y": 210, "type": "block", "width": 40, "height": 40 },
     { "x": 3160, "y": 210, "type": "block", "width": 40, "height": 40 },

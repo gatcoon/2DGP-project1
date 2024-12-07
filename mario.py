@@ -42,7 +42,10 @@ class Mario:
         self.damage_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.mp3')
         self.damage_sound.set_volume(32)
 
-    def update(self, blocks, enemies, powerups, reset_to_section_1):
+        self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
+        self.coin_sound.set_volume(32)
+
+    def update(self, blocks, enemies, powerups, coins, reset_to_section_1):
         if self.is_dead:
             self.handle_death(reset_to_section_1)
             return
@@ -69,10 +72,9 @@ class Mario:
         # 중력 및 충돌 처리
         self.on_ground = False
         next_y = self.y + self.jump_speed
-        next_x = self.x + self.velocity
 
         for block in blocks:
-            collision_side = self.check_collision(block, next_x, next_y)
+            collision_side = self.check_collision(block, next_y)
             if collision_side == "top":
                 self.on_ground = True
                 self.is_jumping = False
@@ -86,12 +88,6 @@ class Mario:
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
-            elif collision_side == "left":
-                self.velocity = 0
-                self.x = block.x - (15 if not self.is_big else 18)  # 왼쪽에서 충돌
-            elif collision_side == "right":
-                self.velocity = 0
-                self.x = block.x + block.width + (15 if not self.is_big else 18)  # 오른쪽에서 충돌
 
         # 적과의 충돌 처리
         for enemy in enemies:
@@ -119,6 +115,12 @@ class Mario:
         for powerup in powerups:
             if self.check_powerup_collision(powerup):
                 self.handle_powerup(powerup)
+
+        # 코인 충돌 처리
+        for coin in coins:
+            if self.check_coin_collision(coin):
+                coin.is_active = False
+                self.coin_sound.play()
 
         # 중력 적용
         if not self.on_ground:
@@ -151,12 +153,12 @@ class Mario:
             delay(2.0)
             reset_to_section_1()
 
-    def check_collision(self, block, next_x, next_y):
+    def check_collision(self, block, next_y):
         mario_width = 15 if not self.is_big else 18
         mario_height = 16 if not self.is_big else 32
 
-        mario_left = next_x - mario_width
-        mario_right = next_x + mario_width
+        mario_left = self.x - mario_width
+        mario_right = self.x + mario_width
         mario_bottom = next_y - mario_height
         mario_top = next_y + mario_height
 
@@ -172,10 +174,6 @@ class Mario:
                 return "bottom"
             elif mario_top > block_bottom and self.jump_speed <= 0:
                 return "top"
-            elif mario_left < block_right and self.velocity > 0:
-                return "right"
-            elif mario_right > block_left and self.velocity < 0:
-                return "left"
         return None
 
     def check_enemy_collision(self, enemy):
@@ -209,6 +207,24 @@ class Mario:
             and mario_right > powerup_left
             and mario_bottom < powerup_top
             and mario_top > powerup_bottom
+        )
+
+    def check_coin_collision(self, coin):
+        if not coin.is_active:
+            return False
+
+        mario_left = self.x - (15 if not self.is_big else 20)
+        mario_right = self.x + (15 if not self.is_big else 20)
+        mario_bottom = self.y - (16 if not self.is_big else 40)
+        mario_top = self.y + (16 if not self.is_big else 40)
+
+        coin_left, coin_bottom, coin_right, coin_top = coin.get_collision_box()
+
+        return (
+            mario_left < coin_right
+            and mario_right > coin_left
+            and mario_bottom < coin_top
+            and mario_top > coin_bottom
         )
 
     def reset_position(self):
