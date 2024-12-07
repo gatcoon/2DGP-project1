@@ -40,10 +40,10 @@ class Mario:
         self.death_sound.set_volume(32)
 
         self.damage_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.mp3')
-        self.damage_sound.set_volume(32)
+        self.damage_sound.set_volume(16)
 
         self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
-        self.coin_sound.set_volume(32)
+        self.coin_sound.set_volume(16)
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1):
         if self.is_dead:
@@ -143,6 +143,7 @@ class Mario:
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
             powerup.is_active = False
             self.powerup_sound.play()
+            
 
     def handle_death(self, reset_to_section_1):
         self.y += self.jump_speed

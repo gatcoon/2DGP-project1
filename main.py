@@ -6,7 +6,7 @@ class FixedBackground:
     def __init__(self):
         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/stage_1_1.png')
         self.bgm = load_music('C:/Githup_2024_2/2DGP-project1/sounds/01. Ground Theme.mp3')
-        self.bgm.set_volume(32)
+        self.bgm.set_volume(40)
         self.bgm.repeat_play()
 
     def draw(self, section_start, scaled_width, screen_height):
