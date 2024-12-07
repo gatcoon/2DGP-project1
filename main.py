@@ -52,12 +52,14 @@ def main():
     num_sections = scaled_width // section_width
     current_section = 0
 
+    # `reset_to_section_1` 함수 정의
     def reset_to_section_1():
         nonlocal current_section
         current_section = 0
         mario.reset_position()
         map_loader.reset_map()  # 모든 상태 초기화 및 파워업 제거
         background.restart_music()  # 배경음악을 다시 재생
+
     running = True
     while running:
         clear_canvas()
@@ -77,7 +79,7 @@ def main():
             map_loader.get_enemies(current_section),
             map_loader.get_powerups(current_section),
             map_loader.get_coins(current_section),
-            reset_to_section_1,
+            reset_to_section_1,  # 함수 전달
             map_loader  # map_loader 전달
         )
 
@@ -129,6 +131,15 @@ def main():
                 running = False
             elif event.type in (SDL_KEYDOWN, SDL_KEYUP):
                 mario.handle_event(event)
+                # P 키를 누르면 다음 섹션으로 이동
+                if event.type == SDL_KEYDOWN and event.key == SDLK_p:
+                    if current_section < num_sections - 1:
+                        current_section += 1  # 다음 섹션으로 이동
+                        mario.x = 40  # 마리오를 섹션 시작 위치로 이동하고 40 추가 이동
+                        map_loader.reset_enemies(current_section)  # 현재 섹션의 적 상태 초기화
+                    else:
+                        # 마지막 섹션에서는 현재 위치 유지
+                        mario.x = screen_width - 1
 
         delay(0.03)
 
