@@ -84,18 +84,17 @@ def main():
             map_loader  # map_loader 전달
         )
 
-        # 깃발 충돌 처리
-        for flag in map_loader.flags:
-            flag_left, flag_bottom, flag_right, flag_top = flag.get_collision_box()
-            if (
-                    mario.x > flag_left and mario.x < flag_right and
-                    mario.y > flag_bottom and mario.y < flag_top
-            ):
-                # 깃발에 도달했을 때 처리
-                print("Goal Reached!")
-                flag.is_active = False
-                # 목표 도달 처리 (예: 게임 종료, 다음 레벨로 이동)
-                running = False  # 예시: 게임 종료
+        # 깃발 충돌 처리 (마지막 섹션에서만)
+        if current_section == num_sections - 1:  # 마지막 섹션인지 확인
+            for flag in map_loader.flags:
+                flag_left, flag_bottom, flag_right, flag_top = flag.get_collision_box()
+                if (
+                        mario.x > flag_left and mario.x < flag_right and
+                        mario.y > flag_bottom and mario.y < flag_top
+                ):
+                    print("Goal Reached!")
+                    flag.is_active = False
+                    mario.grab_flag(mario.is_big)  # 깃발 잡기 동작 호출
 
         # 파워업 업데이트
         for powerup in map_loader.get_powerups(current_section):

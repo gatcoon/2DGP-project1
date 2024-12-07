@@ -23,6 +23,9 @@ class Mario:
         self.is_dead = False
         self.last_movement_time = time()  # 마지막 움직임 시간을 초기화
         self.sitting = False  # 앉는 상태 여부를 나타내는 변수
+        self.on_flag = False  # 깃발에 붙어 있는지 여부
+        self.flag_target_y = 130  # 깃발에서 내려올 목표 Y 좌표
+        self.flag_image = None  # 깃발 잡기 상태의 이미지
 
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
@@ -56,6 +59,12 @@ class Mario:
         if self.is_dead:
             self.handle_death(reset_to_section_1)
             return
+
+        if self.on_flag:
+            # 깃발 동작 처리
+            if self.y > self.flag_target_y:
+                self.y -= 2  # 천천히 내려오기
+            return  # 다른 동작은 무시
 
         # 무적 상태 지속 시간 확인
         if self.is_invincible and time() - self.invincible_start_time > 2:
@@ -309,6 +318,11 @@ class Mario:
         output_height = 32 if not self.is_big else 80
         frame_width = frame_width_small if not self.is_big else frame_width_big
 
+        if self.on_flag:
+            # 깃발 동작일 때 별도 이미지 출력
+            self.flag_image.draw(self.x, self.y, 34 if not self.is_big else 40, 80)
+            return
+
         if self.is_invincible and int(time() * 10) % 2 == 0:
             return
 
@@ -322,3 +336,13 @@ class Mario:
                 self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,
                 0, 'h', self.x, self.y, output_width, output_height
             )
+
+    def grab_flag(self, is_big):
+        """깃발을 잡았을 때 호출."""
+        self.on_flag = True
+        self.velocity = 0  # 이동 중지
+        self.state = "flag"  # 상태 전환
+        self.flag_image = load_image(
+            'C:/Githup_2024_2/2DGP-project1/sprites/big_mario_flag_grab.png' if is_big
+            else 'C:/Githup_2024_2/2DGP-project1/sprites/small_mario_flag_grab.png'
+        )
