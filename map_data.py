@@ -252,6 +252,8 @@ map_data = [
     { "x": 7600, "y": 450, "type": "coin" },
     { "x": 7640, "y": 490, "type": "coin" },
     { "x": 7680, "y": 530, "type": "coin" },
-    { "x": 7720, "y": 570, "type": "coin" }
+    { "x": 7720, "y": 570, "type": "coin" },
+
+    { "x": 7920, "y": 90, "type": "flag", "width": 40, "height": 400 }
 
 ]

@@ -74,6 +74,7 @@ def main():
         map_loader.draw(current_section)
 
         # 마리오 업데이트
+        # 마리오 업데이트
         mario.update(
             map_loader.get_blocks(current_section),
             map_loader.get_enemies(current_section),
@@ -82,6 +83,19 @@ def main():
             reset_to_section_1,  # 함수 전달
             map_loader  # map_loader 전달
         )
+
+        # 깃발 충돌 처리
+        for flag in map_loader.flags:
+            flag_left, flag_bottom, flag_right, flag_top = flag.get_collision_box()
+            if (
+                    mario.x > flag_left and mario.x < flag_right and
+                    mario.y > flag_bottom and mario.y < flag_top
+            ):
+                # 깃발에 도달했을 때 처리
+                print("Goal Reached!")
+                flag.is_active = False
+                # 목표 도달 처리 (예: 게임 종료, 다음 레벨로 이동)
+                running = False  # 예시: 게임 종료
 
         # 파워업 업데이트
         for powerup in map_loader.get_powerups(current_section):

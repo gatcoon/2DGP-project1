@@ -3,6 +3,8 @@ from enemy import Enemy
 from powerup import PowerUp
 from coin import Coin
 from map_data import map_data
+from flag import Flag
+
 
 class MapLoader:
     def __init__(self):
@@ -10,6 +12,8 @@ class MapLoader:
         self.enemies = []   # 적 객체 리스트
         self.powerups = []  # 파워업 객체 리스트
         self.coins = []     # 코인 객체 리스트
+        self.flags = []
+
         self.load_map()
 
     def load_map(self):
@@ -45,6 +49,9 @@ class MapLoader:
             elif data["type"] == "coin":
                 coin = Coin(data["x"] % section_width, data["y"])
                 self.coins[section_index].append(coin)
+            elif data["type"] == "flag":
+                flag = Flag(data["x"] % section_width, data["y"], data["width"], data["height"])
+                self.flags.append(flag)
 
     def reset_map(self):
         """전체 맵 상태를 초기화."""
@@ -93,6 +100,8 @@ class MapLoader:
                 powerup.draw(0)
             for coin in self.coins[section]:
                 coin.draw(0)
+            for flag in self.flags:
+                flag.draw(0)
 
     def get_blocks(self, section):
         """해당 섹션의 블럭 리스트를 반환."""
