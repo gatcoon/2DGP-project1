@@ -16,16 +16,25 @@ class MapLoader:
         section_width = 800  # 각 섹션의 너비
         num_sections = max(data["x"] // section_width for data in map_data) + 1
 
+        # 각 섹션 초기화
         for section in range(num_sections):
             self.sections.append([])
             self.enemies.append([])
             self.powerups.append([])
             self.coins.append([])
 
+        # 데이터 로드 및 객체 생성
         for data in map_data:
-            section_index = data["x"] // section_width
+            section_index = data["x"] // section_width  # 섹션 인덱스 계산
             if data["type"] in ["block", "question_block", "pipe", "invisible", "solid"]:
-                block = Block(data["x"] % section_width, data["y"], data["width"], data["height"], data["type"])
+                block = Block(
+                    data["x"] % section_width,  # 섹션 상대 X 좌표
+                    data["y"],                 # Y 좌표는 그대로
+                    data["width"],
+                    data["height"],
+                    data["type"],
+                    section_index              # 섹션 인덱스 전달
+                )
                 self.sections[section_index].append(block)
             elif data["type"] == "enemy":
                 enemy = Enemy(data["x"] % section_width, data["y"])
@@ -42,7 +51,7 @@ class MapLoader:
         for section_index in range(len(self.sections)):
             # 블럭 초기화
             for block in self.sections[section_index]:
-                block.reset()  # 각 블럭의 상태 초기화
+                block.reset()
 
             # 적 초기화
             self.reset_enemies(section_index)
@@ -72,6 +81,7 @@ class MapLoader:
                 coin.is_active = True
 
     def draw(self, section):
+        """해당 섹션의 모든 객체를 그리기."""
         if 0 <= section < len(self.sections):
             for block in self.sections[section]:
                 block.draw(0)
@@ -83,19 +93,22 @@ class MapLoader:
                 coin.draw(0)
 
     def get_blocks(self, section):
+        """해당 섹션의 블럭 리스트를 반환."""
         return self.sections[section] if 0 <= section < len(self.sections) else []
 
     def get_enemies(self, section):
+        """해당 섹션의 적 리스트를 반환."""
         return self.enemies[section] if 0 <= section < len(self.enemies) else []
 
     def get_powerups(self, section):
+        """해당 섹션의 파워업 리스트를 반환."""
         return self.powerups[section] if 0 <= section < len(self.powerups) else []
 
     def get_coins(self, section):
+        """해당 섹션의 코인 리스트를 반환."""
         return self.coins[section] if 0 <= section < len(self.coins) else []
 
-    def add_powerup(self, powerup):
-        """현재 섹션에 파워업 추가"""
-        section_index = powerup.x // 800
+    def add_powerup(self, powerup, section_index):
+        """특정 섹션에 파워업 추가."""
         if 0 <= section_index < len(self.powerups):
             self.powerups[section_index].append(powerup)
