@@ -89,27 +89,32 @@ class Mario:
                 self.y = block.y - (40 if self.is_big else 32)
                 break
 
+        # 블록 위에 있지 않고 공중 상태라면 점프 상태로 전환
+        if not self.on_ground:
+            self.is_jumping = True
+
         # 적과의 충돌 처리
         for enemy in enemies:
-            if self.check_enemy_collision(enemy):
-                if self.jump_speed < 0:  # 적을 밟을 때
-                    self.jump_speed = 10
-                    enemy.handle_defeat()
-                    self.stomp_sound.play()  # 적을 밟을 때 소리 재생
-                elif not self.is_invincible:  # 무적 상태가 아닐 때만 데미지 처리
-                    if self.is_big:
-                        self.is_big = False
-                        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
-                        self.is_invincible = True
-                        self.invincible_start_time = time()
-                        self.damage_sound.play()  # 데미지 소리 재생
-                    else:
-                        self.state = "death"
-                        self.is_dead = True
-                        self.frame = 5
-                        self.jump_speed = 30
-                        self.death_sound.play()  # 사망 시 음악 재생
-                        break
+            collision_result = self.check_enemy_collision(enemy)
+            if collision_result == "stomp":  # 점프 상태로 적과 충돌
+                self.jump_speed = 10  # 밟고 튀어오르는 속도
+                self.is_jumping = True  # 점프 상태 유지
+                enemy.handle_defeat()  # 적 패배 처리
+                self.stomp_sound.play()  # 밟는 소리 재생
+            elif collision_result == "collision" and not self.is_invincible:  # 일반 충돌 시 피해 처리
+                if self.is_big:
+                    self.is_big = False
+                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+                    self.is_invincible = True
+                    self.invincible_start_time = time()
+                    self.damage_sound.play()  # 데미지 소리 재생
+                else:
+                    self.state = "death"
+                    self.is_dead = True
+                    self.frame = 5
+                    self.jump_speed = 30
+                    self.death_sound.play()  # 사망 시 음악 재생
+                    break
 
         # 파워업 아이템 충돌 처리
         for powerup in powerups:
@@ -122,10 +127,11 @@ class Mario:
                 coin.is_active = False
                 self.coin_sound.play()
 
-        # 중력 적용
+        # 중력 적용 및 최대 낙하 속도 제한
         if not self.on_ground:
             self.y += self.jump_speed
             self.jump_speed -= self.gravity
+            self.jump_speed = max(self.jump_speed, -18)  # 낙하 속도를 -15로 제한
 
         # 낙사 처리
         if self.y < -50:
@@ -143,7 +149,6 @@ class Mario:
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
             powerup.is_active = False
             self.powerup_sound.play()
-            
 
     def handle_death(self, reset_to_section_1):
         self.y += self.jump_speed
@@ -185,12 +190,23 @@ class Mario:
 
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
-        return (
-            mario_left < enemy_right
-            and mario_right > enemy_left
-            and mario_bottom < enemy_top
-            and mario_top > enemy_bottom
+        # 충돌 여부 확인
+        is_colliding = (
+                mario_left < enemy_right
+                and mario_right > enemy_left
+                and mario_bottom < enemy_top
+                and mario_top > enemy_bottom
         )
+
+        # 점프 상태에서 적과 충돌하면 "점프"로 판정
+        if is_colliding and self.is_jumping:
+            return "stomp"
+
+        # 점프가 아닌 상태에서의 일반 충돌
+        if is_colliding:
+            return "collision"
+
+        return None
 
     def check_powerup_collision(self, powerup):
         if not powerup.is_active:
