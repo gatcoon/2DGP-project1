@@ -21,6 +21,8 @@ class Mario:
         self.on_ground = False
         self.running = False
         self.is_dead = False
+        self.last_movement_time = time()  # 마지막 움직임 시간을 초기화
+        self.sitting = False  # 앉는 상태 여부를 나타내는 변수
 
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
@@ -41,14 +43,14 @@ class Mario:
         self.death_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_mariodie.mp3')
         self.death_sound.set_volume(32)
 
-        self.damage_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.mp3')
+        self.damage_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.wav')
         self.damage_sound.set_volume(16)
 
         self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
         self.coin_sound.set_volume(16)
 
         self.break_block_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smw_break_block.wav')
-        self.break_block_sound.set_volume(50)  # 볼륨 설정
+        self.break_block_sound.set_volume(50)
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
         if self.is_dead:
@@ -58,6 +60,22 @@ class Mario:
         # 무적 상태 지속 시간 확인
         if self.is_invincible and time() - self.invincible_start_time > 2:
             self.is_invincible = False
+
+        # 가만히 있는 시간 확인 및 앉는 상태 전환
+        if self.velocity == 0 and not self.is_jumping:
+            if time() - self.last_movement_time > 3 and not self.sitting:
+                self.sitting = True
+                if self.is_big:
+                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_sit.png')
+                else:
+                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_sit.png')
+        elif self.velocity != 0 or self.is_jumping:
+            if self.sitting:
+                self.sitting = False
+                if self.is_big:
+                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
+                else:
+                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
 
         # 이동 처리
         move_speed = 1.4 if not self.running else 2.5
@@ -88,8 +106,8 @@ class Mario:
                 break
             elif collision_side == "bottom":
                 if block.block_type in ["block", "question_block"] and not block.is_activated:
-                    block.activate(map_loader)  # 블럭 활성화
-                    self.break_block_sound.play()  # 블럭 소리 재생
+                    block.activate(map_loader)
+                    self.break_block_sound.play()
                 self.jump_speed = 0
                 self.y = block.y - (40 if self.is_big else 32)
                 break
@@ -101,25 +119,24 @@ class Mario:
         # 적과의 충돌 처리
         for enemy in enemies:
             collision_result = self.check_enemy_collision(enemy)
-            if collision_result == "stomp":  # 점프 상태로 적과 충돌
-                self.jump_speed = 10  # 밟고 튀어오르는 속도
-                self.is_jumping = True  # 점프 상태 유지
-                enemy.handle_defeat()  # 적 패배 처리
-                self.stomp_sound.play()  # 밟는 소리 재생
-            elif collision_result == "collision" and not self.is_invincible:  # 일반 충돌 시 피해 처리
+            if collision_result == "stomp":
+                self.jump_speed = 10
+                self.is_jumping = True
+                enemy.handle_defeat()
+                self.stomp_sound.play()
+            elif collision_result == "collision" and not self.is_invincible:  # 적과 충돌 시
                 if self.is_big:
                     self.is_big = False
                     self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
                     self.is_invincible = True
                     self.invincible_start_time = time()
-                    self.damage_sound.play()  # 데미지 소리 재생
+                    self.damage_sound.play()  # 배경음악 중단 없이 효과음 재생
                 else:
                     self.state = "death"
                     self.is_dead = True
                     self.frame = 5
                     self.jump_speed = 30
-                    self.death_sound.play()  # 사망 시 음악 재생
-                    break
+                    self.death_sound.play()  # 배경음악 중단 없이 사망음악 재생
 
         # 파워업 아이템 충돌 처리
         for powerup in powerups:
@@ -136,7 +153,7 @@ class Mario:
         if not self.on_ground:
             self.y += self.jump_speed
             self.jump_speed -= self.gravity
-            self.jump_speed = max(self.jump_speed, -18)  # 낙하 속도를 -18로 제한
+            self.jump_speed = max(self.jump_speed, -18)
 
         # 낙사 처리
         if self.y < -50:
@@ -162,7 +179,7 @@ class Mario:
         if self.y < -100:
             self.reset_position()
             delay(2.0)
-            reset_to_section_1()
+            reset_to_section_1()  # 초기화 함수 호출
 
     def check_collision(self, block, next_y):
         mario_width = 15 if not self.is_big else 18
@@ -188,28 +205,23 @@ class Mario:
         return None
 
     def check_enemy_collision(self, enemy):
-        # 마리오의 충돌 박스
         mario_left = self.x - (15 if not self.is_big else 20)
         mario_right = self.x + (15 if not self.is_big else 20)
         mario_bottom = self.y - (16 if not self.is_big else 40)
         mario_top = self.y + (16 if not self.is_big else 40)
 
-        # 적의 충돌 박스
         enemy_left, enemy_bottom, enemy_right, enemy_top = enemy.get_collision_box()
 
-        # 충돌 여부 확인
         is_colliding = (
-                mario_left < enemy_right
-                and mario_right > enemy_left
-                and mario_bottom < enemy_top
-                and mario_top > enemy_bottom
+            mario_left < enemy_right
+            and mario_right > enemy_left
+            and mario_bottom < enemy_top
+            and mario_top > enemy_bottom
         )
 
-        # 점프 상태에서 적 위쪽을 밟는 경우 판정
         if is_colliding and self.is_jumping and mario_bottom < enemy_top:
             return "stomp"
 
-        # 점프가 아닌 상태에서의 일반 충돌
         if is_colliding:
             return "collision"
 
@@ -264,6 +276,7 @@ class Mario:
             return
 
         if event.type == SDL_KEYDOWN:
+            self.last_movement_time = time()
             if event.key == SDLK_RIGHT:
                 self.velocity = 4
                 self.facing_direction = 1
@@ -281,6 +294,7 @@ class Mario:
             elif event.key == SDLK_z:
                 self.running = True
         elif event.type == SDL_KEYUP:
+            self.last_movement_time = time()
             if event.key == SDLK_RIGHT and self.velocity > 0:
                 self.velocity = 0
             elif event.key == SDLK_LEFT and self.velocity < 0:

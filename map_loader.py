@@ -56,11 +56,11 @@ class MapLoader:
             # 적 초기화
             self.reset_enemies(section_index)
 
-            # 파워업 초기화
-            self.reset_powerups(section_index)
-
             # 코인 초기화
             self.reset_coins(section_index)
+
+        # 모든 파워업 제거
+        self.reset_powerups()
 
     def reset_enemies(self, section):
         """해당 섹션의 적 상태를 초기화."""
@@ -68,11 +68,13 @@ class MapLoader:
             for enemy in self.enemies[section]:
                 enemy.reset()  # 적 초기화 메서드 호출
 
-    def reset_powerups(self, section):
-        """해당 섹션의 파워업 상태를 초기화."""
-        if 0 <= section < len(self.powerups):
-            for powerup in self.powerups[section]:
-                powerup.is_active = True
+    def reset_powerups(self, section=None):
+        """맵의 모든 파워업 상태를 초기화 및 제거."""
+        if section is None:  # 모든 섹션의 파워업을 제거
+            for powerup_list in self.powerups:
+                powerup_list.clear()
+        elif 0 <= section < len(self.powerups):  # 특정 섹션의 파워업만 제거
+            self.powerups[section].clear()
 
     def reset_coins(self, section):
         """해당 섹션의 코인 상태를 초기화."""

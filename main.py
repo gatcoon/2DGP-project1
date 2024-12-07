@@ -56,9 +56,8 @@ def main():
         nonlocal current_section
         current_section = 0
         mario.reset_position()
-        map_loader.reset_map()
+        map_loader.reset_map()  # 모든 상태 초기화 및 파워업 제거
         background.restart_music()  # 배경음악을 다시 재생
-
     running = True
     while running:
         clear_canvas()

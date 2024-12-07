@@ -4,6 +4,7 @@ from pico2d import *
 class PowerUp:
     def __init__(self, x, y, powerup_type):
         self.x, self.y = x, y
+        self.initial_x, self.initial_y = x, y  # 초기 위치 저장
         self.width, self.height = 40, 40  # 버섯 크기
         self.powerup_type = powerup_type
         self.image = self.load_image()
@@ -12,6 +13,7 @@ class PowerUp:
         self.velocity_y = 0  # 초기 수직 속도
         self.gravity = 1.0  # 중력 가속도
         self.screen_width = 800  # 화면 너비
+
 
     def load_image(self):
         """파워업 타입에 따른 이미지 로드."""
