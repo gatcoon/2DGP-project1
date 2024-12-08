@@ -16,6 +16,10 @@ class Block:
         self.contains_powerup = self.block_type == "question_block"  # 특정 블럭만 파워업 포함
         self.section_index = section_index  # 블럭이 속한 섹션 정보 저장
 
+        # 파워업 등장 소리 로드
+        self.powerup_appears_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_powerup_appears.wav')
+        self.powerup_appears_sound.set_volume(32)
+
     def load_image(self):
         """블록 타입에 따른 이미지를 로드."""
         if self.block_type == "block":
@@ -38,6 +42,7 @@ class Block:
                 powerup_x = self.x + self.width // 2  # 블럭 중앙
                 powerup_y = self.y + self.height + 20  # 블럭 위 20 위치
                 powerup = PowerUp(powerup_x, powerup_y, "mushroom")
+                self.powerup_appears_sound.play()  # 파워업 등장 소리 재생
                 map_loader.add_powerup(powerup, self.section_index)
 
     def reset(self):

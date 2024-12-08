@@ -19,15 +19,18 @@ class FixedBackground:
         self.bgm.repeat_play()
 
 
-def draw_text(text, x, y, size):
+def draw_text(text, x, y, size, color=(255, 255, 255)):
     font = load_font('C:/Windows/Fonts/Arial.ttf', size)
-    font.draw(x - len(text) * size // 4, y, text, (255, 255, 255))
+    font.draw(x - len(text) * size // 4, y, text, color)
+
 
 def draw_score(score):
     draw_text(f'SCORE: {score}', 100, 550, 30)
 
+
 def draw_life(lives):
     draw_text(f'LIFE: {lives}', 700, 550, 30)
+
 
 def main():
     open_canvas(800, 600)
@@ -37,6 +40,8 @@ def main():
     game_over_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/game_over.png')  # 게임 오버 화면 로드
     game_over_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_gameover.mp3')  # 게임 오버 사운드 로드
     game_over_sound.set_volume(40)
+    game_clear_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_stage_clear.mp3')  # 클리어 음악 로드
+    game_clear_sound.set_volume(40)
 
     screen_width, screen_height = 800, 600
 
@@ -74,7 +79,8 @@ def main():
     timer_paused = False  # 타이머 멈춤 상태 플래그
     final_time = None  # 최종 시간을 저장하기 위한 변수
     game_over = False  # 게임 오버 상태
-    game_over_sound_played = False  # 게임 오버 사운드 재생 여부 플래그
+    game_clear = False  # 게임 클리어 상태
+    game_clear_music_played = False  # 게임 클리어 음악 재생 여부
 
     def reset_to_section_1():
         nonlocal current_section, timer_paused, start_time, final_time, game_over
@@ -99,9 +105,30 @@ def main():
             update_canvas()
 
             # 게임 오버 사운드 재생
-            if not game_over_sound_played:
+            if not game_over_sound.is_playing():
                 game_over_sound.play()
-                game_over_sound_played = True
+
+            # 입력 대기
+            events = get_events()
+            for event in events:
+                if event.type == SDL_QUIT:
+                    running = False
+                elif event.type == SDL_KEYDOWN:
+                    running = False  # 게임 종료
+            delay(0.1)
+            continue
+
+        if game_clear:
+            # 게임 클리어 화면 표시
+            clear_canvas()
+            draw_text("GAME CLEAR!", 400, 300, 60, color=(0, 0, 0))
+            draw_text(f"FINAL SCORE: {mario.score}", 400, 200, 50, color=(0, 0, 0))
+            update_canvas()
+
+            # 클리어 음악 재생
+            if not game_clear_music_played:
+                game_clear_sound.play()
+                game_clear_music_played = True
 
             # 입력 대기
             events = get_events()
@@ -156,6 +183,8 @@ def main():
                     if not timer_paused:  # 타이머가 처음 멈출 때만 처리
                         timer_paused = True
                         final_time = remaining_time  # 멈춘 시간 저장
+                    if not mario.on_flag:
+                        game_clear = True  # 게임 클리어 상태로 전환
 
         # 파워업 업데이트
         for powerup in map_loader.get_powerups(current_section):
