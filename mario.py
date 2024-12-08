@@ -32,6 +32,7 @@ class Mario:
         self.walking_after_flag = False  # 깃발 이후 걷기 시작 여부
         self.walk_timer = None  # 깃발 이후 걷기 대기 시간
         self.score = 0  # 점수 초기화
+        self.lives = 3  # 초기 라이프 설정
 
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
@@ -255,17 +256,22 @@ class Mario:
             self.powerup_sound.play()
 
     def handle_death(self, reset_to_section_1):
-        """마리오가 죽을 때 호출되는 메서드."""
         if self.is_respawning:
             return  # 리스폰 대기 중이면 다시 죽지 않음
 
         self.state = "death"
         self.is_dead = True
-        self.is_respawning = True  # 리스폰 대기 상태로 설정
+        self.is_respawning = True
+        self.lives -= 1  # 라이프 감소
+        if self.lives <= 0:
+            print("Game Over")
+            # 게임 오버 처리 로직 추가 가능
+
+        # 리스폰 로직
         self.is_big = False
         self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
-        self.frame = 5  # 죽는 애니메이션 프레임
-        self.jump_speed = 25  # 초기 점프 속도 설정
+        self.frame = 5
+        self.jump_speed = 25
         self.velocity = 0
         self.death_sound.play()
 
@@ -280,6 +286,13 @@ class Mario:
 
         # 화면 아래로 사라지면 리스폰 처리
         if self.y < -50:
+            if self.lives > 0:
+                self.lives -= 1  # 라이프 감소
+                print(f"Lives remaining: {self.lives}")
+            else:
+                print("Game Over")
+                return  # 게임 오버 처리 (추가 구현 가능)
+
             self.is_dead = False
             self.state = "idle"
             self.frame = 0

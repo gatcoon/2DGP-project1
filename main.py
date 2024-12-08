@@ -26,11 +26,18 @@ def draw_text(text, x, y, size):
 def draw_score(score):
     draw_text(f'SCORE: {score}', 100, 550, 30)
 
+def draw_life(lives):
+    draw_text(f'LIFE: {lives}', 700, 550, 30)
+
 def main():
     open_canvas(800, 600)
 
     # 타이틀 화면 로드
     title_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/title.png')
+    game_over_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/game_over.png')  # 게임 오버 화면 로드
+    game_over_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_gameover.mp3')  # 게임 오버 사운드 로드
+    game_over_sound.set_volume(40)
+
     screen_width, screen_height = 800, 600
 
     # 배경 및 음악
@@ -66,20 +73,45 @@ def main():
     start_time = time()  # 시작 시간
     timer_paused = False  # 타이머 멈춤 상태 플래그
     final_time = None  # 최종 시간을 저장하기 위한 변수
+    game_over = False  # 게임 오버 상태
+    game_over_sound_played = False  # 게임 오버 사운드 재생 여부 플래그
 
     def reset_to_section_1():
-        nonlocal current_section, timer_paused, start_time, final_time
-        current_section = 0
-        mario.reset_position()
-        map_loader.reset_map()
-        background.restart_music()
-        timer_paused = False  # 타이머 초기화
-        start_time = time()
-        final_time = None
+        nonlocal current_section, timer_paused, start_time, final_time, game_over
+        if mario.lives > 0:
+            current_section = 0
+            mario.reset_position()
+            map_loader.reset_map()
+            background.restart_music()
+            timer_paused = False
+            start_time = time()
+            final_time = None
+        else:
+            game_over = True  # 게임 오버 상태로 전환
 
     running = True
     while running:
         clear_canvas()
+
+        if game_over:
+            # 게임 오버 화면 표시
+            game_over_image.draw_to_origin(0, 0, screen_width, screen_height)
+            update_canvas()
+
+            # 게임 오버 사운드 재생
+            if not game_over_sound_played:
+                game_over_sound.play()
+                game_over_sound_played = True
+
+            # 입력 대기
+            events = get_events()
+            for event in events:
+                if event.type == SDL_QUIT:
+                    running = False
+                elif event.type == SDL_KEYDOWN:
+                    running = False  # 게임 종료
+            delay(0.1)
+            continue
 
         # 타이머 업데이트
         if not timer_paused:
@@ -170,6 +202,9 @@ def main():
 
         # 점수 표시
         draw_score(mario.score)
+
+        # 라이프 표시
+        draw_life(mario.lives)
 
         # 타이머 텍스트 표시
         draw_text(f'TIME: {remaining_time}', 400, 550, 30)
