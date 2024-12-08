@@ -1,6 +1,7 @@
 from pico2d import *
 
 from powerup import PowerUp
+from utils import resource_path
 
 
 class Block:
@@ -17,17 +18,17 @@ class Block:
         self.section_index = section_index  # 블럭이 속한 섹션 정보 저장
 
         # 파워업 등장 소리 로드
-        self.powerup_appears_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_powerup_appears.wav')
+        self.powerup_appears_sound = load_wav(resource_path('sounds/effects/smb_powerup_appears.wav'))
         self.powerup_appears_sound.set_volume(32)
 
     def load_image(self):
         """블록 타입에 따른 이미지를 로드."""
         if self.block_type == "block":
-            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/block.png')
+            return load_image(resource_path('sprites/block.png'))
         elif self.block_type == "question_block":
-            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/question_block.png')
+            return load_image(resource_path('sprites/question_block.png'))
         elif self.block_type == "solid":
-            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')
+            return load_image(resource_path('sprites/solid_block.png'))
         return None
 
     def activate(self, map_loader):
@@ -35,7 +36,7 @@ class Block:
         if not self.is_activated and self.block_type in ["block", "question_block"]:
             self.is_activated = True
             self.block_type = "solid"  # 타입을 solid로 변경
-            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/solid_block.png')  # 이미지 변경
+            self.image = load_image(resource_path('sprites/solid_block.png'))  # 이미지 변경
 
             # 파워업 생성 로직
             if self.contains_powerup:

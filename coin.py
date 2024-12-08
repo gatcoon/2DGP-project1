@@ -1,10 +1,13 @@
 from pico2d import *
 
+from utils import resource_path
+
+
 class Coin:
     def __init__(self, x, y):
         self.x, self.y = x, y
         self.width, self.height = 30, 40  # 크기 조정
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/coin.png')
+        self.image = load_image(resource_path('sprites/coin.png'))
         self.frame = 0
         self.frame_count = 4  # 총 4개의 프레임
         self.frame_delay = 0

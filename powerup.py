@@ -1,5 +1,7 @@
 from pico2d import *
 
+from utils import resource_path
+
 
 class PowerUp:
     def __init__(self, x, y, powerup_type):
@@ -18,7 +20,7 @@ class PowerUp:
     def load_image(self):
         """파워업 타입에 따른 이미지 로드."""
         if self.powerup_type == "mushroom":
-            return load_image('C:/Githup_2024_2/2DGP-project1/sprites/mushroom.png')
+            return load_image(resource_path('sprites/mushroom.png'))
         return None
 
     def update(self, blocks):

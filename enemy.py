@@ -1,5 +1,8 @@
 from pico2d import *
 
+from utils import resource_path
+
+
 class Enemy:
     def __init__(self, x, y):
         self.initial_x, self.initial_y = x, y  # 초기 위치 저장
@@ -7,7 +10,7 @@ class Enemy:
         self.width, self.height = 40, 40
         self.velocity = -2  # 초기 이동 방향 (왼쪽)
         self.frame = 0
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/goomba.png')
+        self.image = load_image(resource_path('sprites/goomba.png'))
         self.is_defeated = False  # 적이 패배 상태인지 여부
         self.defeat_timer = 0  # 패배 상태 유지 시간
         self.frame_delay = 0  # 애니메이션 프레임 속도 조절용

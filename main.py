@@ -2,12 +2,18 @@ from pico2d import *
 from mario import Mario
 from map_loader import MapLoader
 from time import time
+import os
+os.environ['PYSDL2_DLL_PATH'] = os.path.abspath('.')
+
+import sys
+
+from utils import resource_path
 
 
 class FixedBackground:
     def __init__(self):
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/stage_1_1.png')
-        self.bgm = load_music('C:/Githup_2024_2/2DGP-project1/sounds/01. Ground Theme.mp3')
+        self.image = load_image(resource_path('sprites/stage_1_1.png'))
+        self.bgm = load_music(resource_path('sounds/01. Ground Theme.mp3'))
         self.bgm.set_volume(40)
         self.bgm.repeat_play()
 
@@ -17,7 +23,6 @@ class FixedBackground:
     def restart_music(self):
         self.bgm.stop()
         self.bgm.repeat_play()
-
 
 def draw_text(text, x, y, size, color=(255, 255, 255)):
     font = load_font('C:/Windows/Fonts/Arial.ttf', size)
@@ -36,11 +41,12 @@ def main():
     open_canvas(800, 600)
 
     # 타이틀 화면 로드
-    title_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/title.png')
-    game_over_image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/game_over.png')  # 게임 오버 화면 로드
-    game_over_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_gameover.mp3')  # 게임 오버 사운드 로드
+    title_image = load_image(resource_path('sprites/title.png'))
+    game_over_image = load_image(resource_path('sprites/game_over.png'))
+    game_clear_image = load_image(resource_path('sprites/game_clear.png'))
+    game_over_sound = load_music(resource_path('sounds/smb_gameover.mp3'))
     game_over_sound.set_volume(40)
-    game_clear_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_stage_clear.mp3')  # 클리어 음악 로드
+    game_clear_sound = load_music(resource_path('sounds/smb_stage_clear.mp3'))
     game_clear_sound.set_volume(40)
 
     screen_width, screen_height = 800, 600
@@ -74,13 +80,14 @@ def main():
     current_section = 0
 
     # 타이머 설정
-    game_timer = 400  # 타이머 기본값
+    game_timer = 300  # 타이ptr머 기본값
     start_time = time()  # 시작 시간
     timer_paused = False  # 타이머 멈춤 상태 플래그
     final_time = None  # 최종 시간을 저장하기 위한 변수
     game_over = False  # 게임 오버 상태
     game_clear = False  # 게임 클리어 상태
     game_clear_music_played = False  # 게임 클리어 음악 재생 여부
+    game_clear_time = None  # 게임 클리어 시작 시간
 
     def reset_to_section_1():
         nonlocal current_section, timer_paused, start_time, final_time, game_over
@@ -95,8 +102,6 @@ def main():
         else:
             game_over = True  # 게임 오버 상태로 전환
 
-    game_over_sound_played = False  # 게임 오버 사운드 재생 여부 플래그
-
     running = True
     while running:
         clear_canvas()
@@ -107,9 +112,8 @@ def main():
             update_canvas()
 
             # 게임 오버 사운드 재생
-            if not game_over_sound_played:
+            if not game_over_sound.is_playing():
                 game_over_sound.play()
-                game_over_sound_played = True
 
             # 입력 대기
             events = get_events()
@@ -122,24 +126,28 @@ def main():
             continue
 
         if game_clear:
-            # 게임 클리어 화면 표시
             clear_canvas()
             draw_text("GAME CLEAR!", 400, 300, 60, color=(0, 0, 0))
             draw_text(f"FINAL SCORE: {mario.score}", 400, 200, 50, color=(0, 0, 0))
             update_canvas()
 
-            # 클리어 음악 재생
             if not game_clear_music_played:
                 game_clear_sound.play()
                 game_clear_music_played = True
 
-            # 입력 대기
             events = get_events()
             for event in events:
                 if event.type == SDL_QUIT:
                     running = False
                 elif event.type == SDL_KEYDOWN:
-                    running = False  # 게임 종료
+                    running = False
+            delay(0.1)
+            continue
+
+            # 최종 점수와 클리어 문구 출력
+            draw_text("GAME CLEAR!", 400, 300, 60, color=(0, 0, 0))
+            draw_text(f"FINAL SCORE: {mario.score}", 400, 200, 50, color=(0, 0, 0))
+            update_canvas()
             delay(0.1)
             continue
 
@@ -173,7 +181,7 @@ def main():
                 map_loader
             )
 
-        # 깃발 충돌 처리
+        # 깃발 충돌 처리 및 게임 클리어 조건
         if current_section == num_sections - 1:
             for flag in map_loader.flags:
                 flag_left, flag_bottom, flag_right, flag_top = flag.get_collision_box()
@@ -188,6 +196,16 @@ def main():
                         final_time = remaining_time  # 멈춘 시간 저장
                     if not mario.on_flag:
                         game_clear = True  # 게임 클리어 상태로 전환
+
+        # x 좌표가 8200에 도달하면 게임 클리어 처리
+        if mario.x >= 8200:
+            if not game_clear:  # 중복 처리 방지
+                print("Mario reached the end!")
+                game_clear = True
+                game_clear_time = time()
+                if not game_clear_music_played:
+                    game_clear_sound.play()
+                    game_clear_music_played = True
 
         # 파워업 업데이트
         for powerup in map_loader.get_powerups(current_section):

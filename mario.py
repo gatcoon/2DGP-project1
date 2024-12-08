@@ -2,6 +2,8 @@ from pico2d import *
 from time import time
 
 import map_loader
+from utils import resource_path
+
 
 
 class Mario:
@@ -17,7 +19,7 @@ class Mario:
         self.is_big = False
         self.is_invincible = False
         self.invincible_start_time = 0
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+        self.image = load_image(resource_path('sprites/small_mario_state.png'))
         self.on_ground = False
         self.running = False
         self.is_dead = False
@@ -35,31 +37,32 @@ class Mario:
         self.lives = 3  # 초기 라이프 설정
 
         # 효과음 로드
-        self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
+        self.small_jump_sound = load_wav(resource_path('sounds/effects/smb_jump-small.wav'))
         self.small_jump_sound.set_volume(26)
 
-        self.super_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-super.wav')
+        self.super_jump_sound = load_wav(resource_path('sounds/effects/smb_jump-super.wav'))
         self.super_jump_sound.set_volume(26)
 
-        self.powerup_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_powerup.wav')
+        self.powerup_sound = load_wav(resource_path('sounds/effects/smb_powerup.wav'))
         self.powerup_sound.set_volume(32)
 
-        self.stomp_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_stomp.wav')
+        self.stomp_sound = load_wav(resource_path('sounds/effects/smb_stomp.wav'))
         self.stomp_sound.set_volume(32)
 
-        self.block_hit_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
+        self.block_hit_sound = load_wav(resource_path('sounds/effects/smb_coin.wav'))
         self.block_hit_sound.set_volume(32)
 
-        self.death_sound = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_mariodie.mp3')
+        self.death_sound = load_music(resource_path('sounds/smb_mariodie.mp3'))
         self.death_sound.set_volume(32)
 
-        self.damage_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/mario-damage.wav')
+        self.damage_sound = load_wav(resource_path('sounds/effects/mario-damage.wav'))
         self.damage_sound.set_volume(16)
 
-        self.coin_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_coin.wav')
+        self.coin_sound = load_wav(resource_path('sounds/effects/smb_coin.wav'))
+
         self.coin_sound.set_volume(16)
 
-        self.break_block_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smw_break_block.wav')
+        self.break_block_sound = load_wav(resource_path('sounds/effects/smw_break_block.wav'))
         self.break_block_sound.set_volume(50)
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
@@ -86,7 +89,7 @@ class Mario:
                 if not self.walking_after_flag:
                     # 스테이지 클리어 음악 재생
                     if not self.stage_clear_music:
-                        self.stage_clear_music = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_stage_clear.mp3')
+                        self.stage_clear_music = load_music(resource_path('sounds/smb_stage_clear.mp3'))
                         self.stage_clear_music.set_volume(40)
                         self.stage_clear_music.play()
 
@@ -152,16 +155,16 @@ class Mario:
             if time() - self.last_movement_time > 3 and not self.sitting:
                 self.sitting = True
                 if self.is_big:
-                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_sit.png')
+                    self.image = load_image(resource_path('sprites/big_mario_sit.png'))
                 else:
-                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_sit.png')
+                    self.image = load_image(resource_path('sprites/small_mario_sit.png'))
         elif self.velocity != 0 or self.is_jumping:
             if self.sitting:
                 self.sitting = False
                 if self.is_big:
-                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
+                    self.image = load_image(resource_path('sprites/big_mario_state.png'))
                 else:
-                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+                    self.image = load_image(resource_path('sprites/small_mario_state.png'))
 
         # 이동 처리
         move_speed = 1.4 if not self.running else 2.5
@@ -213,7 +216,7 @@ class Mario:
             elif collision_result == "collision" and not self.is_invincible:  # 적과 충돌 시
                 if self.is_big:
                     self.is_big = False
-                    self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+                    self.image = load_image(resource_path('sprites/small_mario_state.png'))
                     self.is_invincible = True
                     self.invincible_start_time = time()
                     self.damage_sound.play()  # 배경음악 중단 없이 효과음 재생
@@ -246,7 +249,7 @@ class Mario:
             self.state = "death"
             self.is_dead = True
             self.is_big = False
-            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+            self.image = load_image(resource_path('sprites/small_mario_state.png'))
             self.frame = 5
             self.jump_speed = 30
             self.death_sound.play()
@@ -254,7 +257,7 @@ class Mario:
     def handle_powerup(self, powerup):
         if powerup.powerup_type == "mushroom":
             self.is_big = True
-            self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
+            self.image = load_image(resource_path('sprites/big_mario_state.png'))
             powerup.is_active = False
             self.score += 500  # 점수 추가
             self.powerup_sound.play()
@@ -273,7 +276,7 @@ class Mario:
 
         # 리스폰 로직
         self.is_big = False
-        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+        self.image = load_image(resource_path('sprites/small_mario_state.png'))
         self.frame = 5
         self.jump_speed = 25
         self.velocity = 0
@@ -477,11 +480,11 @@ class Mario:
         background.bgm.stop()
 
         # 깃발 사운드 재생
-        self.flagpole_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_flagpole.wav')
+        self.flagpole_sound = load_wav(resource_path('sounds/effects/smb_flagpole.wav'))
         self.flagpole_sound.set_volume(32)
         self.flagpole_sound.play()
 
         self.flag_image = load_image(
-            'C:/Githup_2024_2/2DGP-project1/sprites/big_mario_flag_grab.png' if is_big
-            else 'C:/Githup_2024_2/2DGP-project1/sprites/small_mario_flag_grab.png'
+            resource_path('sprites/big_mario_flag_grab.png') if is_big
+            else resource_path('sprites/small_mario_flag_grab.png')
         )
