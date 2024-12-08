@@ -31,6 +31,8 @@ class Mario:
         self.flag_stage_complete = False  # 깃발 동작 완료 여부
         self.walking_after_flag = False  # 깃발 이후 걷기 시작 여부
         self.walk_timer = None  # 깃발 이후 걷기 대기 시간
+        self.score = 0  # 점수 초기화
+
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
         self.small_jump_sound.set_volume(26)
@@ -249,6 +251,7 @@ class Mario:
             self.is_big = True
             self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/big_mario_state.png')
             powerup.is_active = False
+            self.score += 500  # 점수 추가
             self.powerup_sound.play()
 
     def handle_death(self, reset_to_section_1):
@@ -323,6 +326,7 @@ class Mario:
         )
 
         if is_colliding and self.is_jumping and mario_bottom < enemy_top:
+            self.score += 200  # 적을 밟았을 때 점수 추가
             return "stomp"
 
         if is_colliding:
@@ -350,7 +354,7 @@ class Mario:
 
     def check_coin_collision(self, coin):
         if not coin.is_active:
-            return False
+            return False  # 이미 비활성화된 코인 무시
 
         mario_left = self.x - (15 if not self.is_big else 20)
         mario_right = self.x + (15 if not self.is_big else 20)
@@ -359,12 +363,18 @@ class Mario:
 
         coin_left, coin_bottom, coin_right, coin_top = coin.get_collision_box()
 
-        return (
-            mario_left < coin_right
-            and mario_right > coin_left
-            and mario_bottom < coin_top
-            and mario_top > coin_bottom
-        )
+        if (
+                mario_left < coin_right
+                and mario_right > coin_left
+                and mario_bottom < coin_top
+                and mario_top > coin_bottom
+        ):
+            coin.is_active = False  # 코인을 비활성화하여 다시 충돌하지 않도록 설정
+            self.score += 100  # 점수 추가
+            self.coin_sound.play()
+            return True
+
+        return False
 
     def reset_position(self):
         self.x, self.y = 300, 100

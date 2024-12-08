@@ -23,6 +23,8 @@ def draw_text(text, x, y, size):
     font = load_font('C:/Windows/Fonts/Arial.ttf', size)
     font.draw(x - len(text) * size // 4, y, text, (255, 255, 255))
 
+def draw_score(score):
+    draw_text(f'SCORE: {score}', 100, 550, 30)
 
 def main():
     open_canvas(800, 600)
@@ -165,6 +167,9 @@ def main():
         # 동전 그리기
         for coin in map_loader.get_coins(current_section):
             coin.draw(0)
+
+        # 점수 표시
+        draw_score(mario.score)
 
         # 타이머 텍스트 표시
         draw_text(f'TIME: {remaining_time}', 400, 550, 30)
