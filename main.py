@@ -95,6 +95,8 @@ def main():
         else:
             game_over = True  # 게임 오버 상태로 전환
 
+    game_over_sound_played = False  # 게임 오버 사운드 재생 여부 플래그
+
     running = True
     while running:
         clear_canvas()
@@ -105,8 +107,9 @@ def main():
             update_canvas()
 
             # 게임 오버 사운드 재생
-            if not game_over_sound.is_playing():
+            if not game_over_sound_played:
                 game_over_sound.play()
+                game_over_sound_played = True
 
             # 입력 대기
             events = get_events()
