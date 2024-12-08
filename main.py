@@ -96,14 +96,18 @@ def main():
         map_loader.draw(current_section)
 
         # 마리오 업데이트
-        mario.update(
-            map_loader.get_blocks(current_section),
-            map_loader.get_enemies(current_section),
-            map_loader.get_powerups(current_section),
-            map_loader.get_coins(current_section),
-            reset_to_section_1,
-            map_loader
-        )
+        if mario.is_dead:
+            mario.update_death(reset_to_section_1)
+
+        else:
+            mario.update(
+                map_loader.get_blocks(current_section),
+                map_loader.get_enemies(current_section),
+                map_loader.get_powerups(current_section),
+                map_loader.get_coins(current_section),
+                reset_to_section_1,
+                map_loader
+            )
 
         # 깃발 충돌 처리
         if current_section == num_sections - 1:

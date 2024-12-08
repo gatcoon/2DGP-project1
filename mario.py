@@ -21,6 +21,7 @@ class Mario:
         self.on_ground = False
         self.running = False
         self.is_dead = False
+        self.is_respawning = False  # 새로 추가: 죽은 후 리스폰 대기 상태
         self.last_movement_time = time()  # 마지막 움직임 시간을 초기화
         self.sitting = False  # 앉는 상태 여부를 나타내는 변수
         self.on_flag = False  # 깃발을 잡았는지 여부
@@ -59,6 +60,13 @@ class Mario:
         self.break_block_sound.set_volume(50)
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
+        if self.is_dead:
+            self.update_death(reset_to_section_1)
+            return
+
+        if self.is_respawning:
+            return  # 리스폰 대기 상태에서는 업데이트 무시
+
         if self.on_flag:
             # 깃발 내려오는 동작
             if self.y > self.flag_target_y:
@@ -87,12 +95,30 @@ class Mario:
                 # 블록 충돌 처리 (걷는 중에도 블록 위에 설 수 있도록)
                 self.on_ground = False
                 for block in blocks:
-                    collision_side = self.check_collision(block, self.y)
+                    collision_side = self.check_collision(block, next_y)
                     if collision_side == "top":
                         self.on_ground = True
+                        self.is_jumping = False
                         self.jump_speed = 0
-                        self.y = block.y + block.height
+                        self.y = block.y + block.height + (25 if self.is_big else 0)
                         break
+                    elif collision_side == "bottom":
+                        if block.block_type in ["block", "question_block"] and not block.is_activated:
+                            block.activate(map_loader)
+                            self.break_block_sound.play()
+                        self.jump_speed = 0
+                        self.y = block.y - (40 if self.is_big else 32)
+                        break
+
+                    # 낙사 판정 제거
+                if not self.on_ground and not self.is_dead:
+                    self.y += self.jump_speed
+                    self.jump_speed -= self.gravity
+                    self.jump_speed = max(self.jump_speed, -18)
+
+                    # 낙사 처리 제거
+                if not self.is_dead and self.y < -50:
+                    self.handle_death(reset_to_section_1)
 
                 if not self.on_ground:
                     self.is_jumping = True
@@ -226,13 +252,37 @@ class Mario:
             self.powerup_sound.play()
 
     def handle_death(self, reset_to_section_1):
+        """마리오가 죽을 때 호출되는 메서드."""
+        if self.is_respawning:
+            return  # 리스폰 대기 중이면 다시 죽지 않음
+
+        self.state = "death"
+        self.is_dead = True
+        self.is_respawning = True  # 리스폰 대기 상태로 설정
+        self.is_big = False
+        self.image = load_image('C:/Githup_2024_2/2DGP-project1/sprites/small_mario_state.png')
+        self.frame = 5  # 죽는 애니메이션 프레임
+        self.jump_speed = 25  # 초기 점프 속도 설정
+        self.velocity = 0
+        self.death_sound.play()
+
+    def update_death(self, reset_to_section_1):
+        """죽는 동안의 동작 처리."""
+        if not self.is_dead:
+            return
+
+        # 위로 점프한 후 아래로 떨어짐
         self.y += self.jump_speed
         self.jump_speed -= self.gravity
 
-        if self.y < -100:
-            self.reset_position()
-            delay(2.0)
-            reset_to_section_1()  # 초기화 함수 호출
+        # 화면 아래로 사라지면 리스폰 처리
+        if self.y < -50:
+            self.is_dead = False
+            self.state = "idle"
+            self.frame = 0
+            delay(2.0)  # 2초 대기
+            self.is_respawning = False  # 리스폰 상태 해제
+            reset_to_section_1()
 
     def check_collision(self, block, next_y):
         mario_width = 15 if not self.is_big else 18
