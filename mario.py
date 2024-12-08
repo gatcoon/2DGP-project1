@@ -70,10 +70,13 @@ class Mario:
         if self.is_respawning:
             return  # 리스폰 대기 상태에서는 업데이트 무시
 
+        # 기본 상태에서 next_y 정의
+        next_y = self.y + self.jump_speed  # 중력에 따른 y 좌표 계산
+
         if self.on_flag:
             # 깃발 내려오는 동작
             if self.y > self.flag_target_y:
-                self.y -= 2  # 천천히 내려오기
+                self.y -= 3  # 천천히 내려오기
             elif not self.flag_stage_complete:
                 self.flag_stage_complete = True
                 self.walk_timer = time()  # 깃발 동작 완료 시간 기록
@@ -97,6 +100,7 @@ class Mario:
 
                 # 블록 충돌 처리 (걷는 중에도 블록 위에 설 수 있도록)
                 self.on_ground = False
+                next_y = self.y  # next_y 정의
                 for block in blocks:
                     collision_side = self.check_collision(block, next_y)
                     if collision_side == "top":
