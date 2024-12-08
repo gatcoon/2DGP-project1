@@ -105,20 +105,23 @@ def main():
             coin.update()
 
         # 섹션 이동 처리
-        if mario.x >= screen_width:
-            if current_section < num_sections - 1:
-                current_section += 1
-                mario.x = 0
-                map_loader.reset_enemies(current_section)
-            else:
-                mario.x = screen_width - 1
-        elif mario.x <= 0:
-            if current_section > 0:
-                current_section -= 1
-                mario.x = screen_width
-                map_loader.reset_enemies(current_section)
-            else:
-                mario.x = 1
+        if current_section == num_sections - 1:  # 섹션 10인 경우
+            pass  # 아무 제한도 두지 않음
+        else:
+            if mario.x >= screen_width:
+                if current_section < num_sections - 1:
+                    current_section += 1
+                    mario.x = 0
+                    map_loader.reset_enemies(current_section)
+                else:
+                    mario.x = screen_width - 1
+            elif mario.x <= 0:
+                if current_section > 0:
+                    current_section -= 1
+                    mario.x = screen_width
+                    map_loader.reset_enemies(current_section)
+                else:
+                    mario.x = 1
 
         # 마리오 그리기
         mario.draw()

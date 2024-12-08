@@ -23,10 +23,13 @@ class Mario:
         self.is_dead = False
         self.last_movement_time = time()  # 마지막 움직임 시간을 초기화
         self.sitting = False  # 앉는 상태 여부를 나타내는 변수
-        self.on_flag = False  # 깃발에 붙어 있는지 여부
+        self.on_flag = False  # 깃발을 잡았는지 여부
         self.flag_target_y = 130  # 깃발에서 내려올 목표 Y 좌표
-        self.flag_image = None  # 깃발 잡기 상태의 이미지
-
+        self.flag_image = None  # 깃발 잡기 이미지
+        self.stage_clear_music = None  # 스테이지 클리어 음악
+        self.flag_stage_complete = False  # 깃발 동작 완료 여부
+        self.walking_after_flag = False  # 깃발 이후 걷기 시작 여부
+        self.walk_timer = None  # 깃발 이후 걷기 대기 시간
         # 효과음 로드
         self.small_jump_sound = load_wav('C:/Githup_2024_2/2DGP-project1/sounds/effects/smb_jump-small.wav')
         self.small_jump_sound.set_volume(26)
@@ -56,15 +59,56 @@ class Mario:
         self.break_block_sound.set_volume(50)
 
     def update(self, blocks, enemies, powerups, coins, reset_to_section_1, map_loader):
-        if self.is_dead:
-            self.handle_death(reset_to_section_1)
-            return
-
         if self.on_flag:
-            # 깃발 동작 처리
+            # 깃발 내려오는 동작
             if self.y > self.flag_target_y:
-                self.y -= 5  # 천천히 내려오기
-            return  # 다른 동작은 무시
+                self.y -= 2  # 천천히 내려오기
+            elif not self.flag_stage_complete:
+                self.flag_stage_complete = True
+                self.walk_timer = time()  # 깃발 동작 완료 시간 기록
+
+            # 깃발에서 내려온 후 3초 대기 후 걷기 시작
+            if self.flag_stage_complete and time() - self.walk_timer >= 3:
+                if not self.walking_after_flag:
+                    # 스테이지 클리어 음악 재생
+                    if not self.stage_clear_music:
+                        self.stage_clear_music = load_music('C:/Githup_2024_2/2DGP-project1/sounds/smb_stage_clear.mp3')
+                        self.stage_clear_music.set_volume(40)
+                        self.stage_clear_music.play()
+
+                    self.walking_after_flag = True  # 걷기 시작
+                    self.velocity = 2  # 오른쪽으로 걷기 속도 설정
+
+                # 걷기 동작 중 중력 적용
+                self.jump_speed -= self.gravity
+                self.y += self.jump_speed
+                self.jump_speed = max(self.jump_speed, -18)
+
+                # 블록 충돌 처리 (걷는 중에도 블록 위에 설 수 있도록)
+                self.on_ground = False
+                for block in blocks:
+                    collision_side = self.check_collision(block, self.y)
+                    if collision_side == "top":
+                        self.on_ground = True
+                        self.jump_speed = 0
+                        self.y = block.y + block.height
+                        break
+
+                if not self.on_ground:
+                    self.is_jumping = True
+
+                # 오른쪽으로 계속 걷기
+                if self.x < 8200:  # 8200까지 걷기
+                    self.x += self.velocity
+                else:
+                    self.velocity = 0  # 8200에 도달하면 멈추기
+                    self.on_flag = False  # 깃발 동작 종료
+
+                # 걷기 애니메이션 (프레임 업데이트)
+                self.state = "walk"
+                self.frame = (self.frame + 1) % 3 + 1
+
+            return  # 다른 동작 무시
 
         # 무적 상태 지속 시간 확인
         if self.is_invincible and time() - self.invincible_start_time > 2:
@@ -319,8 +363,16 @@ class Mario:
         frame_width = frame_width_small if not self.is_big else frame_width_big
 
         if self.on_flag:
-            # 깃발 동작일 때 별도 이미지 출력
-            self.flag_image.draw(self.x, self.y, 34 if not self.is_big else 40, 32if not self.is_big else 80)
+            if self.walking_after_flag:
+                # 걷기 애니메이션 출력
+                frame_width = 17 if not self.is_big else 99 // 5
+                self.image.clip_draw(
+                    self.frame * frame_width, 0, frame_width, 16 if not self.is_big else 32,
+                    self.x, self.y, 34 if not self.is_big else 40, 32 if not self.is_big else 80
+                )
+            else:
+                # 깃발 잡기 이미지 출력
+                self.flag_image.draw(self.x, self.y, 34 if not self.is_big else 40, 32 if not self.is_big else 80)
             return
 
         if self.is_invincible and int(time() * 10) % 2 == 0:
